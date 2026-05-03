@@ -2,6 +2,7 @@
 
 Midgard is meant to be a support library for the Odin language.
 It contains algorithms, data structures, and other numerical functions that I found useful to develop in Odin.
+
 Use at your own peril.
 
 ## License and Copyright

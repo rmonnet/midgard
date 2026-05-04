@@ -14,6 +14,7 @@ If you are using VSCode, I recommend the Odin Language extension by Daniel Gavin
 ## Algorithms and Data Structure
 
 - Union-Find: Set data structure that determines if there is a path between two nodes (`uf__.odin`)
+- Stack: The classic Last In - First Out data structure
 
 ## License and Copyright
 

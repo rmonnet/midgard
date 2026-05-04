@@ -3,15 +3,19 @@ package midgard
 
 import "core:testing"
 
+@(private = "file")
 Node :: struct($T: typeid) {
 	item: T,
 	next: ^Node(T),
 }
 
+// The Stack defines a LIFO data structure.
+// It is initialized by default.
 Stack :: struct($T: typeid) {
 	first: ^Node(T),
 }
 
+// Destroy a Stack containing elements that need to be destroyed themselves.
 st_destroy_with_item_destroy :: proc(s: ^Stack($T), item_destroy: proc(item: T)) {
 
 	for {
@@ -21,19 +25,23 @@ st_destroy_with_item_destroy :: proc(s: ^Stack($T), item_destroy: proc(item: T))
 	}
 }
 
+// Destroy a Stack of elements which don't use dynamic allocation.
 st_destroy_simple :: proc(s: ^Stack($T)) {
 
 	for {
-		item, ok := st_pop(s)
+		_, ok := st_pop(s)
 		if !ok {break}
 	}
 }
 
+// Destroy a stack.
 st_destroy :: proc {
 	st_destroy_simple,
 	st_destroy_with_item_destroy,
 }
 
+// Pop an element from the stack, the ok return value
+// is set to false if there is no element to pop.
 st_pop :: proc(s: ^Stack($T)) -> (item: T, ok: bool) {
 
 	if s.first == nil {return}
@@ -43,12 +51,14 @@ st_pop :: proc(s: ^Stack($T)) -> (item: T, ok: bool) {
 	return first.item, true
 }
 
+// Push an element on the stack.
 st_push :: proc(s: ^Stack($T), item: T) {
 
 	new_first := new_clone(Node(T){item = item, next = s.first})
 	s.first = new_first
 }
 
+// Check if the stack is empty.
 st_is_empty :: proc(s: Stack($T)) -> bool {
 
 	return s.first == nil

@@ -15,50 +15,51 @@ import "core:testing"
 // index :  0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 // values:  5, 2, 7, 4, 8, 6, 6, 7, 8, 8
 Quick_Union_Find :: struct {
-	ids: []int,
+	parents: []int,
 }
 
 // Create a Quick_Union_Find structure of n (initially) unconnected nodes.
-quf_create :: proc(n: int, allocator: mem.Allocator) -> Quick_Union_Find {
+quf_create :: proc(n: int, allocator: mem.Allocator = context.allocator) -> Quick_Union_Find {
 
-	ids := make([]int, n, allocator)
+	parents := make([]int, n, allocator)
 	for i in 0 ..< n {
-		ids[i] = i
+		parents[i] = i
 	}
-	return Quick_Union_Find{ids}
+	return Quick_Union_Find{parents}
 }
 
 // Release the memory associated with the UF structure.
-quf_destroy :: proc(quf: ^Quick_Union_Find) {
+quf_destroy :: proc(set: ^Quick_Union_Find) {
 
-	delete(quf.ids)
+	delete(set.parents)
 }
 
 // Returns the root of a node.
 @(private = "file")
-quf_root_of :: proc(quf: ^Quick_Union_Find, p: int) -> int {
+quf_root_of :: proc(set: ^Quick_Union_Find, p: int) -> int {
 
+	// By definition, a root is its own parent.
 	root := p
-	for root != quf.ids[root] {
-		root = quf.ids[root]
+	for root != set.parents[root] {
+		root = set.parents[root]
 	}
 	return root
 }
 
 // Connect the nodes p and q.
-quf_union :: proc(quf: ^Quick_Union_Find, p, q: int) {
+quf_union :: proc(set: ^Quick_Union_Find, p, q: int) {
 
 	// To connect the two nodes (really the two sets of nodes),
 	// We chaneg the root of the p set to the root of the q set.
-	p_root := quf_root_of(quf, p)
-	q_root := quf_root_of(quf, q)
-	quf.ids[p_root] = q_root
+	p_root := quf_root_of(set, p)
+	q_root := quf_root_of(set, q)
+	set.parents[p_root] = q_root
 }
 
 // Check if the nodes p and q are connected.
-quf_is_connected :: proc(quf: ^Quick_Union_Find, p, q: int) -> bool {
+quf_is_connected :: proc(set: ^Quick_Union_Find, p, q: int) -> bool {
 
-	return quf_root_of(quf, p) == quf_root_of(quf, q)
+	return quf_root_of(set, p) == quf_root_of(set, q)
 }
 
 // --------------------------------------------
@@ -68,48 +69,48 @@ quf_is_connected :: proc(quf: ^Quick_Union_Find, p, q: int) -> bool {
 @(test)
 test_quf_union_2_elements :: proc(t: ^testing.T) {
 
-	nodes := quf_create(10, context.allocator)
-	defer quf_destroy(&nodes)
-	quf_union(&nodes, 4, 3)
+	set := quf_create(10)
+	defer quf_destroy(&set)
+	quf_union(&set, 4, 3)
 	expected := [?]int{0, 1, 2, 3, 3, 5, 6, 7, 8, 9}
-	expect_slices(t, nodes.ids, expected[:])
+	expect_slices(t, set.parents, expected[:])
 }
 
 @(test)
 test_quf_union_3_elements :: proc(t: ^testing.T) {
 
-	nodes := quf_create(10, context.allocator)
-	defer quf_destroy(&nodes)
-	quf_union(&nodes, 4, 3)
-	quf_union(&nodes, 3, 8)
+	set := quf_create(10)
+	defer quf_destroy(&set)
+	quf_union(&set, 4, 3)
+	quf_union(&set, 3, 8)
 	expected := [?]int{0, 1, 2, 8, 3, 5, 6, 7, 8, 9}
-	expect_slices(t, nodes.ids, expected[:])
+	expect_slices(t, set.parents, expected[:])
 }
 
 @(test)
 test_quf_union_many_elements :: proc(t: ^testing.T) {
 
-	nodes := quf_create(10, context.allocator)
-	defer quf_destroy(&nodes)
-	quf_union(&nodes, 4, 3)
-	quf_union(&nodes, 3, 8)
-	quf_union(&nodes, 6, 5)
-	quf_union(&nodes, 9, 4)
-	quf_union(&nodes, 2, 1)
+	set := quf_create(10)
+	defer quf_destroy(&set)
+	quf_union(&set, 4, 3)
+	quf_union(&set, 3, 8)
+	quf_union(&set, 6, 5)
+	quf_union(&set, 9, 4)
+	quf_union(&set, 2, 1)
 	expected := [?]int{0, 1, 1, 8, 3, 5, 5, 7, 8, 8}
-	expect_slices(t, nodes.ids, expected[:])
+	expect_slices(t, set.parents, expected[:])
 }
 
 @(test)
 test_quf_connected :: proc(t: ^testing.T) {
 
-	nodes := quf_create(10, context.allocator)
-	defer quf_destroy(&nodes)
-	quf_union(&nodes, 4, 3)
-	quf_union(&nodes, 3, 8)
-	quf_union(&nodes, 6, 5)
-	quf_union(&nodes, 9, 4)
-	quf_union(&nodes, 2, 1)
-	testing.expect(t, quf_is_connected(&nodes, 8, 9), "8 and 9 are connected")
-	testing.expect(t, !quf_is_connected(&nodes, 0, 5), "0 and 5 are not connected")
+	set := quf_create(10)
+	defer quf_destroy(&set)
+	quf_union(&set, 4, 3)
+	quf_union(&set, 3, 8)
+	quf_union(&set, 6, 5)
+	quf_union(&set, 9, 4)
+	quf_union(&set, 2, 1)
+	testing.expect(t, quf_is_connected(&set, 8, 9), "8 and 9 are connected")
+	testing.expect(t, !quf_is_connected(&set, 0, 5), "0 and 5 are not connected")
 }

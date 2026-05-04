@@ -18,7 +18,7 @@ Union_Find :: struct {
 }
 
 // Create an Union_Find structure of n (initially) unconnected nodes.
-uf_create :: proc(n: int, allocator: mem.Allocator) -> Union_Find {
+uf_create :: proc(n: int, allocator: mem.Allocator = context.allocator) -> Union_Find {
 
 	ids := make([]int, n, allocator)
 	for i in 0 ..< n {
@@ -28,31 +28,31 @@ uf_create :: proc(n: int, allocator: mem.Allocator) -> Union_Find {
 }
 
 // Release the memory associated with the UF structure.
-uf_destroy :: proc(uf: ^Union_Find) {
+uf_destroy :: proc(set: ^Union_Find) {
 
-	delete(uf.ids)
+	delete(set.ids)
 }
 
 // Connect the nodes p and q.
-uf_union :: proc(uf: ^Union_Find, p, q: int) {
+uf_union :: proc(set: ^Union_Find, p, q: int) {
 
 	// Each node (p and q) is part of a pre-existing connection set.
 	// Each connection set is defined by a specific id.
 	// We connect both sets by replacing the id of the p set with the id of q set.
-	p_id := uf.ids[p]
-	q_id := uf.ids[q]
+	p_id := set.ids[p]
+	q_id := set.ids[q]
 	if p_id == q_id {return}
-	for i in 0 ..< len(uf.ids) {
-		if uf.ids[i] == p_id {
-			uf.ids[i] = q_id
+	for i in 0 ..< len(set.ids) {
+		if set.ids[i] == p_id {
+			set.ids[i] = q_id
 		}
 	}
 }
 
 // Check if the nodes p and q are connected.
-uf_is_connected :: proc(uf: ^Union_Find, p, q: int) -> bool {
+uf_is_connected :: proc(set: ^Union_Find, p, q: int) -> bool {
 
-	return uf.ids[p] == uf.ids[q]
+	return set.ids[p] == set.ids[q]
 }
 
 // --------------------------------------------
@@ -62,48 +62,48 @@ uf_is_connected :: proc(uf: ^Union_Find, p, q: int) -> bool {
 @(test)
 test_uf_union_2_elements :: proc(t: ^testing.T) {
 
-	nodes := uf_create(10, context.allocator)
-	defer uf_destroy(&nodes)
-	uf_union(&nodes, 4, 3)
+	set := uf_create(10)
+	defer uf_destroy(&set)
+	uf_union(&set, 4, 3)
 	expected := [?]int{0, 1, 2, 3, 3, 5, 6, 7, 8, 9}
-	expect_slices(t, nodes.ids, expected[:])
+	expect_slices(t, set.ids, expected[:])
 }
 
 @(test)
 test_uf_union_3_elements :: proc(t: ^testing.T) {
 
-	nodes := uf_create(10, context.allocator)
-	defer uf_destroy(&nodes)
-	uf_union(&nodes, 4, 3)
-	uf_union(&nodes, 3, 8)
+	set := uf_create(10)
+	defer uf_destroy(&set)
+	uf_union(&set, 4, 3)
+	uf_union(&set, 3, 8)
 	expected := [?]int{0, 1, 2, 8, 8, 5, 6, 7, 8, 9}
-	expect_slices(t, nodes.ids, expected[:])
+	expect_slices(t, set.ids, expected[:])
 }
 
 @(test)
 test_uf_union_many_elements :: proc(t: ^testing.T) {
 
-	nodes := uf_create(10, context.allocator)
-	defer uf_destroy(&nodes)
-	uf_union(&nodes, 4, 3)
-	uf_union(&nodes, 3, 8)
-	uf_union(&nodes, 6, 5)
-	uf_union(&nodes, 9, 4)
-	uf_union(&nodes, 2, 1)
+	set := uf_create(10)
+	defer uf_destroy(&set)
+	uf_union(&set, 4, 3)
+	uf_union(&set, 3, 8)
+	uf_union(&set, 6, 5)
+	uf_union(&set, 9, 4)
+	uf_union(&set, 2, 1)
 	expected := [?]int{0, 1, 1, 8, 8, 5, 5, 7, 8, 8}
-	expect_slices(t, nodes.ids, expected[:])
+	expect_slices(t, set.ids, expected[:])
 }
 
 @(test)
 test_uf_connected :: proc(t: ^testing.T) {
 
-	nodes := uf_create(10, context.allocator)
-	defer uf_destroy(&nodes)
-	uf_union(&nodes, 4, 3)
-	uf_union(&nodes, 3, 8)
-	uf_union(&nodes, 6, 5)
-	uf_union(&nodes, 9, 4)
-	uf_union(&nodes, 2, 1)
-	testing.expect(t, uf_is_connected(&nodes, 8, 9), "8 and 9 are connected")
-	testing.expect(t, !uf_is_connected(&nodes, 0, 5), "0 and 5 are not connected")
+	set := uf_create(10)
+	defer uf_destroy(&set)
+	uf_union(&set, 4, 3)
+	uf_union(&set, 3, 8)
+	uf_union(&set, 6, 5)
+	uf_union(&set, 9, 4)
+	uf_union(&set, 2, 1)
+	testing.expect(t, uf_is_connected(&set, 8, 9), "8 and 9 are connected")
+	testing.expect(t, !uf_is_connected(&set, 0, 5), "0 and 5 are not connected")
 }

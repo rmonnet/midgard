@@ -17,7 +17,7 @@ Union_Find :: struct {
 	ids: []int,
 }
 
-// Create an UF structure of n (initially) unconnected nodes.
+// Create an Union_Find structure of n (initially) unconnected nodes.
 uf_create :: proc(n: int, allocator: mem.Allocator) -> Union_Find {
 
 	ids := make([]int, n, allocator)
@@ -50,7 +50,7 @@ uf_union :: proc(uf: ^Union_Find, p, q: int) {
 }
 
 // Check if the nodes p and q are connected.
-uf_connected :: proc(uf: ^Union_Find, p, q: int) -> bool {
+uf_is_connected :: proc(uf: ^Union_Find, p, q: int) -> bool {
 
 	return uf.ids[p] == uf.ids[q]
 }
@@ -60,7 +60,7 @@ uf_connected :: proc(uf: ^Union_Find, p, q: int) -> bool {
 // --------------------------------------------
 
 @(test)
-test_union_2_elements :: proc(t: ^testing.T) {
+test_uf_union_2_elements :: proc(t: ^testing.T) {
 
 	nodes := uf_create(10, context.allocator)
 	defer uf_destroy(&nodes)
@@ -70,7 +70,7 @@ test_union_2_elements :: proc(t: ^testing.T) {
 }
 
 @(test)
-test_union_3_elements :: proc(t: ^testing.T) {
+test_uf_union_3_elements :: proc(t: ^testing.T) {
 
 	nodes := uf_create(10, context.allocator)
 	defer uf_destroy(&nodes)
@@ -81,7 +81,7 @@ test_union_3_elements :: proc(t: ^testing.T) {
 }
 
 @(test)
-test_union_many_elements :: proc(t: ^testing.T) {
+test_uf_union_many_elements :: proc(t: ^testing.T) {
 
 	nodes := uf_create(10, context.allocator)
 	defer uf_destroy(&nodes)
@@ -95,7 +95,7 @@ test_union_many_elements :: proc(t: ^testing.T) {
 }
 
 @(test)
-test_connected :: proc(t: ^testing.T) {
+test_uf_connected :: proc(t: ^testing.T) {
 
 	nodes := uf_create(10, context.allocator)
 	defer uf_destroy(&nodes)
@@ -104,6 +104,6 @@ test_connected :: proc(t: ^testing.T) {
 	uf_union(&nodes, 6, 5)
 	uf_union(&nodes, 9, 4)
 	uf_union(&nodes, 2, 1)
-	testing.expect(t, uf_connected(&nodes, 8, 9), "8 and 9 are connected")
-	testing.expect(t, !uf_connected(&nodes, 0, 5), "0 and 5 are not connected")
+	testing.expect(t, uf_is_connected(&nodes, 8, 9), "8 and 9 are connected")
+	testing.expect(t, !uf_is_connected(&nodes, 0, 5), "0 and 5 are not connected")
 }

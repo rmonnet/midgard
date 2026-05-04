@@ -128,6 +128,8 @@ test_wqufc_union_many_elements :: proc(t: ^testing.T) {
 @(test)
 test_wqufc_connected :: proc(t: ^testing.T) {
 
+	// We have two sets of connected nodes,
+	// {3, 4, 8, 9} and {0, 1, 2, 5, 6, 7}.
 	set := wqufc_create(10, context.allocator)
 	defer wqufc_destroy(&set)
 	wqufc_union(&set, 4, 3)

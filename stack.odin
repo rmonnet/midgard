@@ -3,25 +3,19 @@ package midgard
 
 import "core:testing"
 
-@(private = "file")
-Node :: struct($T: typeid) {
-	item: T,
-	next: ^Node(T),
-}
-
 // The Stack defines a LIFO data structure.
 // It is initialized by default.
 Stack :: struct($T: typeid) {
-	first: ^Node(T),
+	first: ^Linked_List_Node(T),
 }
 
 // Destroy a Stack containing elements that need to be destroyed themselves.
-st_destroy_with_item_destroy :: proc(s: ^Stack($T), item_destroy: proc(item: T)) {
+st_destroy_with_element_destroy :: proc(s: ^Stack($T), element_destroy: proc(element: T)) {
 
 	for {
-		item, ok := st_pop(s)
+		element, ok := st_pop(s)
 		if !ok {break}
-		item_destroy(item)
+		element_destroy(element)
 	}
 }
 
@@ -37,24 +31,24 @@ st_destroy_simple :: proc(s: ^Stack($T)) {
 // Destroy a stack.
 st_destroy :: proc {
 	st_destroy_simple,
-	st_destroy_with_item_destroy,
+	st_destroy_with_element_destroy,
 }
 
 // Pop an element from the stack, the ok return value
 // is set to false if there is no element to pop.
-st_pop :: proc(s: ^Stack($T)) -> (item: T, ok: bool) {
+st_pop :: proc(s: ^Stack($T)) -> (element: T, ok: bool) {
 
 	if s.first == nil {return}
 	first := s.first
 	defer free(first)
 	s.first = first.next
-	return first.item, true
+	return first.element, true
 }
 
 // Push an element on the stack.
-st_push :: proc(s: ^Stack($T), item: T) {
+st_push :: proc(s: ^Stack($T), element: T) {
 
-	new_first := new_clone(Node(T){item = item, next = s.first})
+	new_first := new_clone(Linked_List_Node(T){element = element, next = s.first})
 	s.first = new_first
 }
 
@@ -105,10 +99,12 @@ test_st_pop_not_empty :: proc(t: ^testing.T) {
 	value, ok = st_pop(&s)
 	testing.expect(t, ok)
 	testing.expect_value(t, 1, value)
+	_, ok = st_pop(&s)
+	testing.expect(t, !ok)
 }
 
 @(test)
-test_st_destroy_with_item_destroy :: proc(t: ^testing.T) {
+test_st_destroy_with_element_destroy :: proc(t: ^testing.T) {
 
 	free_int :: proc(n: ^int) {
 		free(n)

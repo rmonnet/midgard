@@ -15,7 +15,9 @@ If you are using VSCode, I recommend the Odin Language extension by Daniel Gavin
 
 - Union-Find: Set data structure that determines if there is a path between two nodes (`uf__.odin`)
 - Stack: The classic Last In - First Out data structure backed by a linked list
-- ArrayStack: The classic Last In - First Out data structure based by a growable Array
+- ArrayStack: The classic Last In - First Out data structure based by a growable array
+- Queue: The classic First In - First Out data structure backed by a linked list
+- 
 
 ## License and Copyright
 

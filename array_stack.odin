@@ -1,4 +1,4 @@
-// This file implements a classic Stack data structure using a slice.
+// This file implements a classic Stack LIFO data structure using a slice.
 package midgard
 
 import "core:testing"
@@ -10,16 +10,16 @@ AST_MIN_SIZE :: 8
 // It is initialized by default.
 ArrayStack :: struct($T: typeid) {
 	elements:   []T,
+	// The next_index represents the next available spot in the stack.
+	// The most recently inserted element is at next_index-1.
 	next_index: int,
 }
 
 // Destroy a Stack containing elements that need to be destroyed themselves.
-ast_destroy_with_item_destroy :: proc(s: ^ArrayStack($T), item_destroy: proc(item: T)) {
+ast_destroy_with_element_destroy :: proc(s: ^ArrayStack($T), element_destroy: proc(element: T)) {
 
-	for {
-		item, ok := ast_pop(s)
-		if !ok {break}
-		item_destroy(item)
+	for i in 0 ..< s.next_index {
+		element_destroy(s.elements[i])
 	}
 	delete(s.elements)
 	s.next_index = 0
@@ -35,11 +35,11 @@ ast_destroy_simple :: proc(s: ^ArrayStack($T)) {
 // Destroy a stack.
 ast_destroy :: proc {
 	ast_destroy_simple,
-	ast_destroy_with_item_destroy,
+	ast_destroy_with_element_destroy,
 }
 
 @(private = "file")
-resize :: proc(s: ^ArrayStack($T), new_size: int) {
+q_resize :: proc(s: ^ArrayStack($T), new_size: int) {
 
 	old_elements := s.elements
 	s.elements = make([]T, new_size)
@@ -51,25 +51,25 @@ resize :: proc(s: ^ArrayStack($T), new_size: int) {
 
 // Pop an element from the stack, the ok return value
 // is set to false if there is no element to pop.
-ast_pop :: proc(s: ^ArrayStack($T)) -> (item: T, ok: bool) {
+ast_pop :: proc(s: ^ArrayStack($T)) -> (element: T, ok: bool) {
 
 	if s.next_index == 0 {return}
 	s.next_index -= 1
-	element := s.elements[s.next_index]
+	element = s.elements[s.next_index]
 	shrink_len := len(s.elements) / 4
 	if shrink_len >= AST_MIN_SIZE && s.next_index < shrink_len {
-		resize(s, shrink_len)
+		q_resize(s, shrink_len)
 	}
 	return element, true
 }
 
 // Push an element on the stack.
-ast_push :: proc(s: ^ArrayStack($T), item: T) {
+ast_push :: proc(s: ^ArrayStack($T), element: T) {
 
 	if s.next_index >= len(s.elements) {
-		resize(s, max(len(s.elements) * 2, AST_MIN_SIZE))
+		q_resize(s, max(len(s.elements) * 2, AST_MIN_SIZE))
 	}
-	s.elements[s.next_index] = item
+	s.elements[s.next_index] = element
 	s.next_index += 1
 }
 
@@ -120,6 +120,8 @@ test_ast_pop_not_empty :: proc(t: ^testing.T) {
 	value, ok = ast_pop(&s)
 	testing.expect(t, ok)
 	testing.expect_value(t, 1, value)
+	_, ok = ast_pop(&s)
+	testing.expect(t, !ok)
 }
 
 @(test)
@@ -156,7 +158,7 @@ test_ast_resize_up :: proc(t: ^testing.T) {
 }
 
 @(test)
-test_ast_destroy_with_item_destroy :: proc(t: ^testing.T) {
+test_ast_destroy_with_element_destroy :: proc(t: ^testing.T) {
 
 	free_int :: proc(n: ^int) {
 		free(n)

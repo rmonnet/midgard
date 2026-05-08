@@ -1,6 +1,7 @@
 // This file contains the implementation for different sort algorithms.
 package midgard
 
+import "core:math/rand"
 import "core:testing"
 
 // Selection sort sorts the xs array in place
@@ -81,13 +82,74 @@ insertion_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 	}
 }
 
+// Shell sort sorts the xs array as an h array
+// (that is considering only the h-th elements of the array)
+// using insertion sort. It then continues to do so while
+// decreasing the value of h down to 1.
+//
+// This is efficient because 1) the h-array stays sorted as we decrease
+// the value of h and 2) insertion sort is efficient when used with partially
+// sorted arrays.
+shell_sort :: proc(xs: []$T) {
+
+	h := 1
+	for h < len(xs) / 3 {
+		h = 3 * h + 1
+	}
+	for ; h >= 1; h = h / 3 {
+		for i := h; i < len(xs); i += 1 {
+			for j := i; j >= h; j -= h {
+				if !(xs[j] < xs[j - h]) {break}
+				xs[j], xs[j - h] = xs[j - h], xs[j]
+			}
+		}
+	}
+}
+
+// Shell sort sorts the xs array as an h array
+// (that is considering only the h-th elements of the array)
+// using insertion sort. It then continues to do so while
+// decreasing the value of h down to 1. It uses the procedure less when
+// comparing the elements.
+//
+// This is efficient because 1) the h-array stays sorted as we decrease
+// the value of h and 2) insertion sort is efficient when used with partially
+// sorted arrays.
+shell_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
+
+	h := 1
+	for h < len(xs) / 3 {
+		h = 3 * h + 1
+	}
+	for ; h >= 1; h = h / 3 {
+		for i := h; i < len(xs); i += 1 {
+			for j := i; j >= h; j -= h {
+				if !less(xs[j], xs[j - h]) {break}
+				xs[j], xs[j - h] = xs[j - h], xs[j]
+			}
+		}
+	}
+}
+
 // -----------------------------------------------
 // Tests
 // -----------------------------------------------
 
+@(private = "file")
 string_less :: proc(a, b: string) -> bool {
 
 	return a < b
+}
+
+@(private = "file")
+is_sorted :: proc(xs: []$T) -> bool {
+
+	for i in 0 ..< len(xs) - 1 {
+		if xs[i] > xs[i + 1] {
+			return false
+		}
+	}
+	return true
 }
 
 @(test)
@@ -98,6 +160,18 @@ test_selection_sort :: proc(t: ^testing.T) {
 	selection_sort(xs[:])
 
 	expect_slices(t, xs[:], expected[:])
+}
+
+@(test)
+test_selection_sort_large :: proc(t: ^testing.T) {
+
+	xs: [1000]f64
+	for i in 0 ..< len(xs) {
+		xs[i] = rand.float64()
+	}
+	selection_sort(xs[:])
+
+	testing.expect(t, is_sorted(xs[:]))
 }
 
 @(test)
@@ -121,6 +195,18 @@ test_insertion_sort :: proc(t: ^testing.T) {
 }
 
 @(test)
+test_insertion_sort_large :: proc(t: ^testing.T) {
+
+	xs: [1000]f64
+	for i in 0 ..< len(xs) {
+		xs[i] = rand.float64()
+	}
+	insertion_sort(xs[:])
+
+	testing.expect(t, is_sorted(xs[:]))
+}
+
+@(test)
 test_insertion_sort_by :: proc(t: ^testing.T) {
 
 	xs := [?]string{"e", "a", "j", "c", "i", "b", "h", "g", "f", "d", "b"}
@@ -128,4 +214,37 @@ test_insertion_sort_by :: proc(t: ^testing.T) {
 	insertion_sort_by(xs[:], string_less)
 
 	expect_string_slices(t, xs[:], expected[:])
+}
+
+@(test)
+test_shell_sort :: proc(t: ^testing.T) {
+
+	xs := [?]int{5, 1, 10, 3, 9, 2, 8, 7, 6, 4, 2}
+	expected := [?]int{1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	shell_sort(xs[:])
+
+	expect_slices(t, xs[:], expected[:])
+}
+
+@(test)
+test_shell_sort_large :: proc(t: ^testing.T) {
+
+	xs: [1000]f64
+	for i in 0 ..< len(xs) {
+		xs[i] = rand.float64()
+	}
+	shell_sort(xs[:])
+
+	testing.expect(t, is_sorted(xs[:]))
+}
+
+@(test)
+test_shell_sort_by :: proc(t: ^testing.T) {
+
+	xs := [?]string{"e", "a", "j", "c", "i", "b", "h", "g", "f", "d", "b"}
+	expected := [?]string{"a", "b", "b", "c", "d", "e", "f", "g", "h", "i", "j"}
+	shell_sort_by(xs[:], string_less)
+
+
+	expect_slices(t, xs[:], expected[:])
 }

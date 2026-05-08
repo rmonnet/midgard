@@ -152,99 +152,98 @@ is_sorted :: proc(xs: []$T) -> bool {
 	return true
 }
 
-@(test)
-test_selection_sort :: proc(t: ^testing.T) {
+@(private = "file")
+test_sort_int_helper :: proc(t: ^testing.T, sort: proc(_: []int), loc := #caller_location) {
 
 	xs := [?]int{5, 1, 10, 3, 9, 2, 8, 7, 6, 4, 2}
 	expected := [?]int{1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	selection_sort(xs[:])
+	sort(xs[:])
 
-	expect_slices(t, xs[:], expected[:])
+	expect_slices(t, xs[:], expected[:], loc)
+}
+
+@(private = "file")
+test_sort_float_helper :: proc(t: ^testing.T, sort: proc(_: []f64), loc := #caller_location) {
+
+	xs: [1000]f64
+	for i in 0 ..< len(xs) {
+		xs[i] = rand.float64()
+	}
+	sort(xs[:])
+
+	testing.expect(t, is_sorted(xs[:]), loc = loc)
+}
+
+@(private = "file")
+test_sort_by_string_helper :: proc(
+	t: ^testing.T,
+	sort_by: proc(_: []string, _: proc(a, b: string) -> bool),
+	loc := #caller_location,
+) {
+
+	xs := [?]string{"e", "a", "j", "c", "i", "b", "h", "g", "f", "d", "b"}
+	expected := [?]string{"a", "b", "b", "c", "d", "e", "f", "g", "h", "i", "j"}
+	sort_by(xs[:], string_less)
+
+	expect_string_slices(t, xs[:], expected[:], loc)
+}
+
+// Test selection sort
+
+@(test)
+test_selection_sort :: proc(t: ^testing.T) {
+	test_sort_int_helper(t, proc(xs: []int) {selection_sort(xs)})
 }
 
 @(test)
 test_selection_sort_large :: proc(t: ^testing.T) {
-
-	xs: [1000]f64
-	for i in 0 ..< len(xs) {
-		xs[i] = rand.float64()
-	}
-	selection_sort(xs[:])
-
-	testing.expect(t, is_sorted(xs[:]))
+	test_sort_float_helper(t, proc(xs: []f64) {selection_sort(xs)})
 }
 
 @(test)
 test_selection_sort_by :: proc(t: ^testing.T) {
-
-	xs := [?]string{"e", "a", "j", "c", "i", "b", "h", "g", "f", "d", "b"}
-	expected := [?]string{"a", "b", "b", "c", "d", "e", "f", "g", "h", "i", "j"}
-	selection_sort_by(xs[:], string_less)
-
-	expect_string_slices(t, xs[:], expected[:])
+	test_sort_by_string_helper(
+		t,
+		proc(xs: []string, less: proc(a, b: string) -> bool) {selection_sort_by(xs, less)},
+	)
 }
+
+// Test insertion sort
 
 @(test)
 test_insertion_sort :: proc(t: ^testing.T) {
-
-	xs := [?]int{5, 1, 10, 3, 9, 2, 8, 7, 6, 4, 2}
-	expected := [?]int{1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	insertion_sort(xs[:])
-
-	expect_slices(t, xs[:], expected[:])
+	test_sort_int_helper(t, proc(xs: []int) {insertion_sort(xs)})
 }
 
 @(test)
 test_insertion_sort_large :: proc(t: ^testing.T) {
-
-	xs: [1000]f64
-	for i in 0 ..< len(xs) {
-		xs[i] = rand.float64()
-	}
-	insertion_sort(xs[:])
-
-	testing.expect(t, is_sorted(xs[:]))
+	test_sort_float_helper(t, proc(xs: []f64) {insertion_sort(xs)})
 }
 
 @(test)
 test_insertion_sort_by :: proc(t: ^testing.T) {
-
-	xs := [?]string{"e", "a", "j", "c", "i", "b", "h", "g", "f", "d", "b"}
-	expected := [?]string{"a", "b", "b", "c", "d", "e", "f", "g", "h", "i", "j"}
-	insertion_sort_by(xs[:], string_less)
-
-	expect_string_slices(t, xs[:], expected[:])
+	test_sort_by_string_helper(
+		t,
+		proc(xs: []string, less: proc(a, b: string) -> bool) {insertion_sort_by(xs, less)},
+	)
 }
+
+// Test shell sort
 
 @(test)
 test_shell_sort :: proc(t: ^testing.T) {
-
-	xs := [?]int{5, 1, 10, 3, 9, 2, 8, 7, 6, 4, 2}
-	expected := [?]int{1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	shell_sort(xs[:])
-
-	expect_slices(t, xs[:], expected[:])
+	test_sort_int_helper(t, proc(xs: []int) {shell_sort(xs)})
 }
 
 @(test)
 test_shell_sort_large :: proc(t: ^testing.T) {
-
-	xs: [1000]f64
-	for i in 0 ..< len(xs) {
-		xs[i] = rand.float64()
-	}
-	shell_sort(xs[:])
-
-	testing.expect(t, is_sorted(xs[:]))
+	test_sort_float_helper(t, proc(xs: []f64) {shell_sort(xs)})
 }
 
 @(test)
 test_shell_sort_by :: proc(t: ^testing.T) {
-
-	xs := [?]string{"e", "a", "j", "c", "i", "b", "h", "g", "f", "d", "b"}
-	expected := [?]string{"a", "b", "b", "c", "d", "e", "f", "g", "h", "i", "j"}
-	shell_sort_by(xs[:], string_less)
-
-
-	expect_slices(t, xs[:], expected[:])
+	test_sort_by_string_helper(
+		t,
+		proc(xs: []string, less: proc(a, b: string) -> bool) {shell_sort_by(xs, less)},
+	)
 }

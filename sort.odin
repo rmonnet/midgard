@@ -2,6 +2,7 @@
 package midgard
 
 import "core:fmt"
+import "core:log"
 import "core:math/rand"
 import "core:slice"
 import "core:testing"
@@ -133,6 +134,87 @@ shell_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 	}
 }
 
+
+@(private = "file")
+ms_merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int) {
+
+	copy(aux[lo:hi + 1], xs[lo:hi + 1])
+	i := lo
+	j := mid + 1
+	for k in lo ..= hi {
+		if i > mid {
+			xs[k] = aux[j]
+			j += 1
+		} else if j > hi {
+			xs[k] = aux[i]
+			i += 1
+		} else if aux[j] < aux[i] {
+			xs[k] = aux[j]
+			j += 1
+		} else {
+			xs[k] = aux[i]
+			i += 1
+		}
+	}
+}
+
+@(private = "file")
+ms_sort :: proc(xs: []$T, aux: []T, lo: int, hi: int) {
+
+	if hi <= lo {return}
+	mid := lo + (hi - lo) / 2
+	ms_sort(xs, aux, lo, mid)
+	ms_sort(xs, aux, mid + 1, hi)
+	ms_merge(xs, aux, lo, mid, hi)
+}
+
+merge_sort :: proc(xs: []$T) {
+
+	aux := make([]T, len(xs))
+	defer delete(aux)
+	ms_sort(xs, aux, 0, len(xs) - 1)
+}
+
+@(private = "file")
+ms_merge_by :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int, less: proc(a, b: T) -> bool) {
+
+	copy(aux[lo:hi + 1], xs[lo:hi + 1])
+	i := lo
+	j := mid + 1
+	for k in lo ..= hi {
+		if i > mid {
+			xs[k] = aux[j]
+			j += 1
+		} else if j > hi {
+			xs[k] = aux[i]
+			i += 1
+		} else if less(aux[j], aux[i]) {
+			xs[k] = aux[j]
+			j += 1
+		} else {
+			xs[k] = aux[i]
+			i += 1
+		}
+	}
+}
+
+@(private = "file")
+ms_sort_by :: proc(xs: []$T, aux: []T, lo: int, hi: int, less: proc(a, b: T) -> bool) {
+
+	if hi <= lo {return}
+	mid := lo + (hi - lo) / 2
+	ms_sort_by(xs, aux, lo, mid, less)
+	ms_sort_by(xs, aux, mid + 1, hi, less)
+	ms_merge_by(xs, aux, lo, mid, hi, less)
+}
+
+merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
+
+	aux := make([]T, len(xs))
+	defer delete(aux)
+	ms_sort_by(xs, aux, 0, len(xs) - 1, less)
+}
+
 // Shuffle uniformely shuffle the values in an array.
 shuffle :: proc(xs: []$T) {
 
@@ -147,11 +229,9 @@ shuffle :: proc(xs: []$T) {
 
 main :: proc() {
 
-	xs := fill_int_array(10)
-	fmt.println(xs)
-	shuffle(xs[:])
-	fmt.println(xs)
-
+	xs := [?]int{5, 1, 10, 3, 9, 2, 8, 7, 6, 4, 2}
+	fmt.println("merge_sort", xs)
+	merge_sort(xs[:])
 }
 
 // -----------------------------------------------
@@ -279,6 +359,26 @@ test_shell_sort_by :: proc(t: ^testing.T) {
 	test_sort_by_string_helper(
 		t,
 		proc(xs: []string, less: proc(a, b: string) -> bool) {shell_sort_by(xs, less)},
+	)
+}
+
+// Test merge sort
+
+@(test)
+test_merge_sort :: proc(t: ^testing.T) {
+	test_sort_int_helper(t, proc(xs: []int) {merge_sort(xs)})
+}
+
+@(test)
+test_merge_sort_large :: proc(t: ^testing.T) {
+	test_sort_float_helper(t, proc(xs: []f64) {merge_sort(xs)})
+}
+
+@(test)
+test_merge_sort_by :: proc(t: ^testing.T) {
+	test_sort_by_string_helper(
+		t,
+		proc(xs: []string, less: proc(a, b: string) -> bool) {merge_sort_by(xs, less)},
 	)
 }
 

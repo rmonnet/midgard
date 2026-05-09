@@ -134,85 +134,96 @@ shell_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 	}
 }
 
-
-@(private = "file")
-ms_merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int) {
-
-	copy(aux[lo:hi + 1], xs[lo:hi + 1])
-	i := lo
-	j := mid + 1
-	for k in lo ..= hi {
-		if i > mid {
-			xs[k] = aux[j]
-			j += 1
-		} else if j > hi {
-			xs[k] = aux[i]
-			i += 1
-		} else if aux[j] < aux[i] {
-			xs[k] = aux[j]
-			j += 1
-		} else {
-			xs[k] = aux[i]
-			i += 1
-		}
-	}
-}
-
-@(private = "file")
-ms_sort :: proc(xs: []$T, aux: []T, lo: int, hi: int) {
-
-	if hi <= lo {return}
-	mid := lo + (hi - lo) / 2
-	ms_sort(xs, aux, lo, mid)
-	ms_sort(xs, aux, mid + 1, hi)
-	ms_merge(xs, aux, lo, mid, hi)
-}
-
+// Merge sort sorts the xs array by recursively dividing the array
+// into two sub-arrays, sorting them and merging them back into the main
+// array.
+//
+// Merge sort requires a secondary array to temporarily hold the sorted
+// sub-arrrays during the merge phase but the temporary array can be
+// reused between the recursive calls.
 merge_sort :: proc(xs: []$T) {
 
-	aux := make([]T, len(xs))
-	defer delete(aux)
-	ms_sort(xs, aux, 0, len(xs) - 1)
-}
+	merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int) {
 
-@(private = "file")
-ms_merge_by :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int, less: proc(a, b: T) -> bool) {
-
-	copy(aux[lo:hi + 1], xs[lo:hi + 1])
-	i := lo
-	j := mid + 1
-	for k in lo ..= hi {
-		if i > mid {
-			xs[k] = aux[j]
-			j += 1
-		} else if j > hi {
-			xs[k] = aux[i]
-			i += 1
-		} else if less(aux[j], aux[i]) {
-			xs[k] = aux[j]
-			j += 1
-		} else {
-			xs[k] = aux[i]
-			i += 1
+		copy(aux[lo:hi + 1], xs[lo:hi + 1])
+		i := lo
+		j := mid + 1
+		for k in lo ..= hi {
+			if i > mid {
+				xs[k] = aux[j]
+				j += 1
+			} else if j > hi {
+				xs[k] = aux[i]
+				i += 1
+			} else if aux[j] < aux[i] {
+				xs[k] = aux[j]
+				j += 1
+			} else {
+				xs[k] = aux[i]
+				i += 1
+			}
 		}
 	}
-}
 
-@(private = "file")
-ms_sort_by :: proc(xs: []$T, aux: []T, lo: int, hi: int, less: proc(a, b: T) -> bool) {
+	sort :: proc(xs: []$T, aux: []T, lo: int, hi: int) {
 
-	if hi <= lo {return}
-	mid := lo + (hi - lo) / 2
-	ms_sort_by(xs, aux, lo, mid, less)
-	ms_sort_by(xs, aux, mid + 1, hi, less)
-	ms_merge_by(xs, aux, lo, mid, hi, less)
-}
+		if hi <= lo {return}
+		mid := lo + (hi - lo) / 2
+		sort(xs, aux, lo, mid)
+		sort(xs, aux, mid + 1, hi)
+		merge(xs, aux, lo, mid, hi)
+	}
 
-merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 
 	aux := make([]T, len(xs))
 	defer delete(aux)
-	ms_sort_by(xs, aux, 0, len(xs) - 1, less)
+	sort(xs, aux, 0, len(xs) - 1)
+}
+
+// Merge sort sorts the xs array by recursively dividing the array
+// into two sub-arrays, sorting them and merging them back into the main
+// array. It uses the procedure less when comparing elements.
+//
+// Merge sort requires a secondary array to temporarily hold the sorted
+// sub-arrrays during the merge phase but the temporary array can be
+// reused between the recursive calls.
+merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
+
+	merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int, less: proc(a, b: T) -> bool) {
+
+		copy(aux[lo:hi + 1], xs[lo:hi + 1])
+		i := lo
+		j := mid + 1
+		for k in lo ..= hi {
+			if i > mid {
+				xs[k] = aux[j]
+				j += 1
+			} else if j > hi {
+				xs[k] = aux[i]
+				i += 1
+			} else if less(aux[j], aux[i]) {
+				xs[k] = aux[j]
+				j += 1
+			} else {
+				xs[k] = aux[i]
+				i += 1
+			}
+		}
+	}
+
+	sort :: proc(xs: []$T, aux: []T, lo: int, hi: int, less: proc(a, b: T) -> bool) {
+
+		if hi <= lo {return}
+		mid := lo + (hi - lo) / 2
+		sort(xs, aux, lo, mid, less)
+		sort(xs, aux, mid + 1, hi, less)
+		merge(xs, aux, lo, mid, hi, less)
+	}
+
+
+	aux := make([]T, len(xs))
+	defer delete(aux)
+	sort(xs, aux, 0, len(xs) - 1, less)
 }
 
 // Shuffle uniformely shuffle the values in an array.

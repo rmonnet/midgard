@@ -1,6 +1,7 @@
 // This file contains the implementation for different sort algorithms.
 package midgard
 
+import "base:intrinsics"
 import "core:fmt"
 import "core:log"
 import "core:math/rand"
@@ -12,7 +13,7 @@ import "core:testing"
 // the smallest element on its right.
 //
 // Its performance is O(N^2).
-selection_sort :: proc(xs: []$T) {
+selection_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 
 	for i in 0 ..< len(xs) {
 		min_j := i
@@ -54,7 +55,7 @@ selection_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 // Its performance is O(N^2).
 // It can be faster than selection sort
 // if the original array is partially sorted.
-insertion_sort :: proc(xs: []$T) {
+insertion_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 
 	for i in 0 ..< len(xs) {
 		for j := i; j > 0; j -= 1 {
@@ -93,7 +94,7 @@ insertion_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 // This is efficient because 1) the h-array stays sorted as we decrease
 // the value of h and 2) insertion sort is efficient when used with partially
 // sorted arrays.
-shell_sort :: proc(xs: []$T) {
+shell_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 
 	h := 1
 	for h < len(xs) / 3 {
@@ -139,9 +140,17 @@ shell_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 // array.
 //
 // Merge sort requires a secondary array to temporarily hold the sorted
-// sub-arrrays during the merge phase but the temporary array can be
+// sub-arrays during the merge phase but the temporary array can be
 // reused between the recursive calls.
-merge_sort :: proc(xs: []$T) {
+//
+// It is an O(N . lgN) algorithm but it requires N additional cells
+// for the auxiliary array.
+merge_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
+
+	// The lower boundary size under which we use
+	// insertion sort instead as an optimization.
+	// This cuts off the number of recursive calls to merge_sort.
+	CUTOFF :: 7
 
 	merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int) {
 
@@ -167,7 +176,11 @@ merge_sort :: proc(xs: []$T) {
 
 	sort :: proc(xs: []$T, aux: []T, lo: int, hi: int) {
 
-		if hi <= lo {return}
+		if (hi - lo + 1) <= CUTOFF {
+			insertion_sort(xs[lo:hi + 1])
+			return
+		}
+
 		mid := lo + (hi - lo) / 2
 		sort(xs, aux, lo, mid)
 		sort(xs, aux, mid + 1, hi)
@@ -187,7 +200,15 @@ merge_sort :: proc(xs: []$T) {
 // Merge sort requires a secondary array to temporarily hold the sorted
 // sub-arrrays during the merge phase but the temporary array can be
 // reused between the recursive calls.
+//
+// It is an O(N . lgN) algorithm but it requires N additional cells
+// for the auxiliary array.
 merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
+
+	// The lower boundary size under which we use
+	// insertion sort instead as an optimization.
+	// This cuts off the number of recursive calls to merge_sort.
+	CUTOFF :: 7
 
 	merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int, less: proc(a, b: T) -> bool) {
 
@@ -213,7 +234,11 @@ merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 
 	sort :: proc(xs: []$T, aux: []T, lo: int, hi: int, less: proc(a, b: T) -> bool) {
 
-		if hi <= lo {return}
+		if (hi - lo + 1) <= CUTOFF {
+			insertion_sort(xs[lo:hi + 1])
+			return
+		}
+
 		mid := lo + (hi - lo) / 2
 		sort(xs, aux, lo, mid, less)
 		sort(xs, aux, mid + 1, hi, less)
@@ -226,7 +251,9 @@ merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 	sort(xs, aux, 0, len(xs) - 1, less)
 }
 
-// Shuffle uniformely shuffle the values in an array.
+// Shuffle uniformly shuffle the values in an array.
+//
+// The resulting random distribution is uniform.
 shuffle :: proc(xs: []$T) {
 
 	// Note: randomly exchanging each card with another
@@ -238,12 +265,6 @@ shuffle :: proc(xs: []$T) {
 	}
 }
 
-main :: proc() {
-
-	xs := [?]int{5, 1, 10, 3, 9, 2, 8, 7, 6, 4, 2}
-	fmt.println("merge_sort", xs)
-	merge_sort(xs[:])
-}
 
 // -----------------------------------------------
 // Tests

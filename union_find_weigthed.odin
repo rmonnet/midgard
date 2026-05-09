@@ -1,11 +1,11 @@
-// This file implements the Weigthed_Quick_Union_Find data structure managing a set of connected nodes.
+// This file implements the Weighted_Union_Find data structure managing a set of connected nodes.
 // Inspired by Algorithms, Video Lecture, Robert Sedgewick, Kevin Wayne (Lecture 1).
 package midgard
 
 import "core:mem"
 import "core:testing"
 
-// The Weighted_Quick_Union_Find structure contains an array indexed by the nodes.
+// The Weighted_Union_Find structure contains an array indexed by the nodes.
 // Each node points to the id of its root. If a node is a root, it points to itself.
 // Two nodes are connected if they have the same root.
 // For efficiency we want the connected sets to be as shallow as possible so
@@ -16,16 +16,13 @@ import "core:testing"
 // one possible representation is
 // index :  0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 // values:  6, 2, 2, 4, 4, 6, 6, 2, 4, 4
-Weighted_Quick_Union_Find :: struct {
+Weighted_Union_Find :: struct {
 	parents: []int,
 	sizes:   []int,
 }
 
-// Create a Weighted_Quick_Union_Find structure of n (initially) unconnected nodes.
-wquf_create :: proc(
-	n: int,
-	allocator: mem.Allocator = context.allocator,
-) -> Weighted_Quick_Union_Find {
+// Create a Weighted_Union_Find structure of n (initially) unconnected nodes.
+wuf_create :: proc(n: int, allocator: mem.Allocator = context.allocator) -> Weighted_Union_Find {
 
 	parents := make([]int, n, allocator)
 	for i in 0 ..< n {
@@ -35,11 +32,11 @@ wquf_create :: proc(
 	for i in 0 ..< n {
 		sizes[i] = 1
 	}
-	return Weighted_Quick_Union_Find{parents, sizes}
+	return Weighted_Union_Find{parents, sizes}
 }
 
 // Release the memory associated with the UF structure.
-wquf_destroy :: proc(set: ^Weighted_Quick_Union_Find) {
+wuf_destroy :: proc(set: ^Weighted_Union_Find) {
 
 	delete(set.parents)
 	delete(set.sizes)
@@ -47,7 +44,7 @@ wquf_destroy :: proc(set: ^Weighted_Quick_Union_Find) {
 
 // Returns the root of a node.
 @(private = "file")
-wquf_root_of :: proc(set: ^Weighted_Quick_Union_Find, p: int) -> int {
+wuf_root_of :: proc(set: ^Weighted_Union_Find, p: int) -> int {
 
 	root := p
 	for root != set.parents[root] {
@@ -57,12 +54,12 @@ wquf_root_of :: proc(set: ^Weighted_Quick_Union_Find, p: int) -> int {
 }
 
 // Connect the nodes p and q.
-wquf_union :: proc(set: ^Weighted_Quick_Union_Find, p, q: int) {
+wuf_union :: proc(set: ^Weighted_Union_Find, p, q: int) {
 
 	// To connect the two nodes (really the two sets of nodes),
 	// We chaneg the root of the p set to the root of the q set.
-	p_root := wquf_root_of(set, p)
-	q_root := wquf_root_of(set, q)
+	p_root := wuf_root_of(set, p)
+	q_root := wuf_root_of(set, q)
 	if set.sizes[p_root] < set.sizes[q_root] {
 		set.parents[p_root] = q_root
 		set.sizes[q_root] += set.sizes[p_root]
@@ -73,9 +70,9 @@ wquf_union :: proc(set: ^Weighted_Quick_Union_Find, p, q: int) {
 }
 
 // Check if the nodes p and q are connected.
-wquf_is_connected :: proc(set: ^Weighted_Quick_Union_Find, p, q: int) -> bool {
+wuf_is_connected :: proc(set: ^Weighted_Union_Find, p, q: int) -> bool {
 
-	return wquf_root_of(set, p) == wquf_root_of(set, q)
+	return wuf_root_of(set, p) == wuf_root_of(set, q)
 }
 
 // --------------------------------------------
@@ -83,54 +80,54 @@ wquf_is_connected :: proc(set: ^Weighted_Quick_Union_Find, p, q: int) -> bool {
 // --------------------------------------------
 
 @(test)
-test_wquf_union_2_elements :: proc(t: ^testing.T) {
+test_wuf_union_2_elements :: proc(t: ^testing.T) {
 
-	set := wquf_create(10)
-	defer wquf_destroy(&set)
-	wquf_union(&set, 4, 3)
+	set := wuf_create(10)
+	defer wuf_destroy(&set)
+	wuf_union(&set, 4, 3)
 	expected := [?]int{0, 1, 2, 4, 4, 5, 6, 7, 8, 9}
 	expect_slices(t, set.parents, expected[:])
 }
 
 @(test)
-test_wquf_union_3_elements :: proc(t: ^testing.T) {
+test_wuf_union_3_elements :: proc(t: ^testing.T) {
 
-	set := wquf_create(10, context.allocator)
-	defer wquf_destroy(&set)
-	wquf_union(&set, 4, 3)
-	wquf_union(&set, 3, 8)
+	set := wuf_create(10, context.allocator)
+	defer wuf_destroy(&set)
+	wuf_union(&set, 4, 3)
+	wuf_union(&set, 3, 8)
 	expected := [?]int{0, 1, 2, 4, 4, 5, 6, 7, 4, 9}
 	expect_slices(t, set.parents, expected[:])
 }
 
 @(test)
-test_wquf_union_many_elements :: proc(t: ^testing.T) {
+test_wuf_union_many_elements :: proc(t: ^testing.T) {
 
-	set := wquf_create(10, context.allocator)
-	defer wquf_destroy(&set)
-	wquf_union(&set, 4, 3)
-	wquf_union(&set, 3, 8)
-	wquf_union(&set, 6, 5)
-	wquf_union(&set, 9, 4)
-	wquf_union(&set, 2, 1)
-	wquf_union(&set, 5, 0)
-	wquf_union(&set, 7, 2)
-	wquf_union(&set, 6, 1)
-	wquf_union(&set, 7, 3)
+	set := wuf_create(10, context.allocator)
+	defer wuf_destroy(&set)
+	wuf_union(&set, 4, 3)
+	wuf_union(&set, 3, 8)
+	wuf_union(&set, 6, 5)
+	wuf_union(&set, 9, 4)
+	wuf_union(&set, 2, 1)
+	wuf_union(&set, 5, 0)
+	wuf_union(&set, 7, 2)
+	wuf_union(&set, 6, 1)
+	wuf_union(&set, 7, 3)
 	expected := [?]int{6, 2, 6, 4, 6, 6, 6, 2, 4, 4}
 	expect_slices(t, set.parents, expected[:])
 }
 
 @(test)
-test_wquf_connected :: proc(t: ^testing.T) {
+test_wuf_connected :: proc(t: ^testing.T) {
 
-	set := wquf_create(10, context.allocator)
-	defer wquf_destroy(&set)
-	wquf_union(&set, 4, 3)
-	wquf_union(&set, 3, 8)
-	wquf_union(&set, 6, 5)
-	wquf_union(&set, 9, 4)
-	wquf_union(&set, 2, 1)
-	testing.expect(t, wquf_is_connected(&set, 8, 9), "8 and 9 are connected")
-	testing.expect(t, !wquf_is_connected(&set, 0, 5), "0 and 5 are not connected")
+	set := wuf_create(10, context.allocator)
+	defer wuf_destroy(&set)
+	wuf_union(&set, 4, 3)
+	wuf_union(&set, 3, 8)
+	wuf_union(&set, 6, 5)
+	wuf_union(&set, 9, 4)
+	wuf_union(&set, 2, 1)
+	testing.expect(t, wuf_is_connected(&set, 8, 9), "8 and 9 are connected")
+	testing.expect(t, !wuf_is_connected(&set, 0, 5), "0 and 5 are not connected")
 }

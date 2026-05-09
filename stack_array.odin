@@ -39,7 +39,7 @@ ast_destroy :: proc {
 }
 
 @(private = "file")
-q_resize :: proc(s: ^ArrayStack($T), new_size: int) {
+ast_resize :: proc(s: ^ArrayStack($T), new_size: int) {
 
 	old_elements := s.elements
 	s.elements = make([]T, new_size)
@@ -58,7 +58,7 @@ ast_pop :: proc(s: ^ArrayStack($T)) -> (element: T, ok: bool) {
 	element = s.elements[s.next_index]
 	shrink_len := len(s.elements) / 4
 	if shrink_len >= AST_MIN_SIZE && s.next_index < shrink_len {
-		q_resize(s, shrink_len)
+		ast_resize(s, shrink_len)
 	}
 	return element, true
 }
@@ -67,7 +67,7 @@ ast_pop :: proc(s: ^ArrayStack($T)) -> (element: T, ok: bool) {
 ast_push :: proc(s: ^ArrayStack($T), element: T) {
 
 	if s.next_index >= len(s.elements) {
-		q_resize(s, max(len(s.elements) * 2, AST_MIN_SIZE))
+		ast_resize(s, max(len(s.elements) * 2, AST_MIN_SIZE))
 	}
 	s.elements[s.next_index] = element
 	s.next_index += 1

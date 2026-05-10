@@ -1,17 +1,20 @@
 // This file contains the implementation for the shell sort algorithm.
-package midgard
-
-import "base:intrinsics"
-import "core:testing"
-
+//
 // Shell sort sorts the xs array as an h array
 // (that is considering only the h-th elements of the array)
 // using insertion sort. It then continues to do so while
 // decreasing the value of h down to 1.
 //
+// The sort is not stable.
 // This is efficient because 1) the h-array stays sorted as we decrease
 // the value of h and 2) insertion sort is efficient when used with partially
 // sorted arrays.
+package midgard
+
+import "base:intrinsics"
+import "core:testing"
+
+// Sort the xs slice in place.
 shell_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 
 	h := 1
@@ -28,15 +31,8 @@ shell_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 	}
 }
 
-// Shell sort sorts the xs array as an h array
-// (that is considering only the h-th elements of the array)
-// using insertion sort. It then continues to do so while
-// decreasing the value of h down to 1. It uses the procedure less when
-// comparing the elements.
-//
-// This is efficient because 1) the h-array stays sorted as we decrease
-// the value of h and 2) insertion sort is efficient when used with partially
-// sorted arrays.
+// Sort the xs slice in place, using the `less()` procedure
+//  parameter to compare elements.
 shell_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 
 	h := 1

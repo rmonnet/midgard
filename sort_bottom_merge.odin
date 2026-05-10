@@ -1,9 +1,5 @@
 // This file contains the implementation for the bottom merge sort algorithm.
-package midgard
-
-import "base:intrinsics"
-import "core:testing"
-
+//
 // Bottom Merge sort sorts the xs array by incrementally sorting
 // larger and larger sections of the array using the merge portion
 // of the sort algorithm. It starts with a section of size 2 and double
@@ -13,8 +9,15 @@ import "core:testing"
 // sub-arrays during the merge phase but the temporary array can be
 // reused between the recursive calls.
 //
+// The sort is stable.
 // It is an O(N . lgN) algorithm but it requires N additional cells
 // for the auxiliary array.
+package midgard
+
+import "base:intrinsics"
+import "core:testing"
+
+// Sort the xs slice in-place.
 bottom_merge_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 
 	merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int) {
@@ -49,6 +52,8 @@ bottom_merge_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 	}
 }
 
+// Sort the xs slice in place, using the `less()` procedure
+//  parameter to compare elements.
 bottom_merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 
 	merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int, less: proc(a, b: T) -> bool) {

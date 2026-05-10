@@ -1,9 +1,5 @@
 // This file contains the implementation for the merge sort algorithm.
-package midgard
-
-import "base:intrinsics"
-import "core:testing"
-
+//
 // Merge sort sorts the xs array by recursively dividing the array
 // into two sub-arrays, sorting them and merging them back into the main
 // array.
@@ -12,8 +8,15 @@ import "core:testing"
 // sub-arrays during the merge phase but the temporary array can be
 // reused between the recursive calls.
 //
+// The sort is stable.
 // It is an O(N . lgN) algorithm but it requires N additional cells
 // for the auxiliary array.
+package midgard
+
+import "base:intrinsics"
+import "core:testing"
+
+// Sort the xs slice in-place.
 merge_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 
 	// The lower boundary size under which we use
@@ -63,16 +66,8 @@ merge_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 	sort(xs, aux, 0, len(xs) - 1)
 }
 
-// Merge sort sorts the xs array by recursively dividing the array
-// into two sub-arrays, sorting them and merging them back into the main
-// array. It uses the procedure less when comparing elements.
-//
-// Merge sort requires a secondary array to temporarily hold the sorted
-// sub-arrays during the merge phase but the temporary array can be
-// reused between the recursive calls.
-//
-// It is an O(N . lgN) algorithm but it requires N additional cells
-// for the auxiliary array.
+// Sort the xs slice in place, using the `less()` procedure
+//  parameter to compare elements.
 merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 
 	// The lower boundary size under which we use

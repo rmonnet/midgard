@@ -1,14 +1,17 @@
 // This file contains the implementation for the selection sort algorithm.
+//
+// Selection sort sorts the xs array in place
+// by examining each element and swapping it with
+// the smallest element on its right.
+//
+// The sort is not stable.
+// Its performance is O(N^2).
 package midgard
 
 import "base:intrinsics"
 import "core:testing"
 
-// Selection sort sorts the xs array in place
-// by examining each element and swapping it with
-// the smallest element on its right.
-//
-// Its performance is O(N^2).
+// Sort the xs slice in-place.
 selection_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 
 	for i in 0 ..< len(xs) {
@@ -22,12 +25,8 @@ selection_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 	}
 }
 
-// Selection sort sorts the xs array in place
-// by examining each element and swapping it with
-// the smallest element on its right using the
-// procedure less for comparison.
-//
-// Its performance is O(N^2).
+// Sort the xs slice in place, using the `less()` procedure
+//  parameter to compare elements.
 selection_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 
 	for i in 0 ..< len(xs) {

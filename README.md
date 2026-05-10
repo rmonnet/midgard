@@ -2,9 +2,9 @@
 
 Midgard is a collection of algorithms and data structure that I built to refresh my knowledge.
 
-I chose Odin as the implementation language because it is very readable and doesn't hide the details of the memory management behind a garbage collector.
+I chose Odin as the implementation language because it is simple, very readable, and doesn't hide the details of the memory management behind a garbage collector.
 
-This library is built without AI coding agents because the goal of the exercise is to learn and I learn by doing.
+This library is built without AI coding agents because the goal of the exercise is to learn and I learn best by doing.
 I do, however, use Claude and Gemini in a separate window as tutors when I have specific questions and need to do research.
 
 The code in this collection is released under the MIT open source license but use at your own peril.
@@ -14,12 +14,12 @@ The code in this collection is released under the MIT open source license but us
 You need to install the [Odin compiler](https://odin-lang.org/).
 
 If you are using [VSCode](https://code.visualstudio.com/), I recommend the Odin Language extension by Daniel Gavin ('danielgavin.ols').
-I have switched to [Zed](https://zed.dev/) with the Odin extension because I found easier to visualize program states when debugging.
+I have switched to [Zed](https://zed.dev/) with the Odin extension because I found it better for visualizing program states when debugging.
 
 ## Algorithms and Data Structures
 
 Here is a quick summary of the collection of algorithms and data structures.
-When multiple version of the same data structure or algorithm is included, the convention is for the type name to show the specialization first (ex: `Array_Stack`) while the file name shows the generic name first (ex: `stack_array.odin`). This makes it easy to spot the different implementations in the source code while still having names that feel more natural.
+When multiple versions of the same data structure or algorithm is included, the convention is for the type name to show the specialization first (ex: `Array_Stack`) while the file name shows the generic name first (ex: `stack_array.odin`). This groups all the related source code together while still providing type and procedure names that roll off the tongue..
 
 ### Algorithms
 
@@ -29,6 +29,7 @@ When multiple version of the same data structure or algorithm is included, the c
   - [shell_sort](./sort_shell.odin): Sorts by sorting pairs of elements that are far apart from each other and progressively reducing the gap between elements to be compared. It is an optimization of insertion sort.
   - [merge_sort](./sort_merge.odin):  Sorts by recursively dividing the input array into two halves, recursively sorting the two halves and finally merging them back together to obtain the sorted array.
   - [bottom_merge_sort](./sort_bottom_merge.odin):  Sorts by iteratively sorting sub-arrays of the input array, using the merge sort merge algorithm and gradually building up to the two half of the array. 
+- [Shuffle](./shuffle.odin): Shuffle the elements of an array with the result being uniformly distributed.
 
 ### Data Structures
 
@@ -43,6 +44,10 @@ When multiple version of the same data structure or algorithm is included, the c
 - Queue: The classic First In - First Out container.
   - [Queue](./queue.odin): Queue implemented as a linked list.
   - [Array_Queue](./queue_array.odin): Queue implemented as a growable array.
+
+## To Do
+
+- [ ] Implement the Convex Hull Algorithm (Sedgewick Algorithms, Lecture 4)
 
 ## License and Copyright
 

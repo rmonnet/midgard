@@ -103,7 +103,7 @@ test_ast_is_not_empty :: proc(t: ^testing.T) {
 test_ast_pop_empty :: proc(t: ^testing.T) {
 
 	s: ArrayStack(int)
-	value, ok := ast_pop(&s)
+	_, ok := ast_pop(&s)
 	testing.expect(t, !ok)
 }
 
@@ -172,3 +172,4 @@ test_ast_destroy_with_element_destroy :: proc(t: ^testing.T) {
 	ast_destroy(&s, free_int)
 	testing.expect(t, ast_is_empty(s))
 }
+

@@ -82,7 +82,7 @@ test_st_is_not_empty :: proc(t: ^testing.T) {
 test_st_pop_empty :: proc(t: ^testing.T) {
 
 	s: Stack(int)
-	value, ok := st_pop(&s)
+	_, ok := st_pop(&s)
 	testing.expect(t, !ok)
 }
 
@@ -118,3 +118,4 @@ test_st_destroy_with_element_destroy :: proc(t: ^testing.T) {
 	st_destroy(&s, free_int)
 	testing.expect(t, st_is_empty(s))
 }
+

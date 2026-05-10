@@ -100,7 +100,7 @@ test_q_is_not_empty :: proc(t: ^testing.T) {
 test_q_pop_empty :: proc(t: ^testing.T) {
 
 	q: Queue(int)
-	value, ok := q_dequeue(&q)
+	_, ok := q_dequeue(&q)
 	testing.expect(t, !ok)
 }
 
@@ -136,3 +136,4 @@ test_q_destroy_with_element_destroy :: proc(t: ^testing.T) {
 	q_destroy(&q, free_int)
 	testing.expect(t, q_is_empty(q))
 }
+

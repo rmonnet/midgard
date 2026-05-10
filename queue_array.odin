@@ -135,7 +135,7 @@ test_aq_is_not_empty :: proc(t: ^testing.T) {
 test_aq_dequeue_empty :: proc(t: ^testing.T) {
 
 	q: ArrayQueue(int)
-	value, ok := aq_dequeue(&q)
+	_, ok := aq_dequeue(&q)
 	testing.expect(t, !ok)
 }
 
@@ -173,7 +173,7 @@ test_aq_resize_down :: proc(t: ^testing.T) {
 	testing.expect(t, ok)
 	testing.expect_value(t, value, 2)
 	for {
-		_, ok := aq_dequeue(&q)
+		_, ok = aq_dequeue(&q)
 		if !ok {break}
 	}
 	testing.expect_value(t, len(q.elements), 8)
@@ -210,3 +210,4 @@ test_aq_destroy_with_element_destroy :: proc(t: ^testing.T) {
 	aq_destroy(&q, free_int)
 	testing.expect(t, aq_is_empty(q))
 }
+

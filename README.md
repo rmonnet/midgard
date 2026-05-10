@@ -24,10 +24,11 @@ When multiple version of the same data structure or algorithm is included, the c
 ### Algorithms
 
 - Sort: A set of algorithms sorting slices. Odin slices represents arrays of any size. Each sort algorithm has two versions: the first assumes a numeric array supporting the `<` operator, the second uses a argument procedure (`proc(a, b:T -> bool)`) to compare elements.
-  - [selection_sort](./sort.odin): Sorts by repeatedly selecting the smallest element from the unsorted portion and swapping it with the first unsorted element.
-  - [insertion_sort](./sort.odin): Sorts by iteratively inserting each element of an unsorted list into its correct position in a sorted portion of the list.
-  - [shell_sort](./sort.odin): Sorts by sorting pairs of elements that are far apart from each other and progressively reducing the gap between elements to be compared. It is an optimization of insertion sort.
-  - [merge_sort](./sort.odin):  Sorts by recursively dividing the input array into two halves, recursively sorting the two halves and finally merging them back together to obtain the sorted array. 
+  - [selection_sort](./sort_selection.odin): Sorts by repeatedly selecting the smallest element from the unsorted portion and swapping it with the first unsorted element.
+  - [insertion_sort](./sort_insertion.odin): Sorts by iteratively inserting each element of an unsorted list into its correct position in a sorted portion of the list.
+  - [shell_sort](./sort_shell.odin): Sorts by sorting pairs of elements that are far apart from each other and progressively reducing the gap between elements to be compared. It is an optimization of insertion sort.
+  - [merge_sort](./sort_merge.odin):  Sorts by recursively dividing the input array into two halves, recursively sorting the two halves and finally merging them back together to obtain the sorted array.
+  - [bottom_merge_sort](./sort_bottom_merge.odin):  Sorts by iteratively sorting sub-arrays of the input array, using the merge sort merge algorithm and gradually building up to the two half of the array. 
 
 ### Data Structures
 

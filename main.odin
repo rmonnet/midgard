@@ -6,9 +6,19 @@ import "core:math/rand"
 import "core:slice"
 import "core:time"
 
+import "./math"
+
 merge_sort_2 :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 
 	less :: #force_inline proc(a, b: T) -> bool {
+		return a < b
+	}
+	merge_sort_by(xs, less)
+}
+
+merge_sort_3 :: proc(xs: []f64) {
+
+	less :: #force_inline proc(a, b: f64) -> bool {
 		return a < b
 	}
 	merge_sort_by(xs, less)
@@ -26,7 +36,7 @@ main :: proc() {
 	start := time.now()
 	merge_sort(ys)
 	elapsed := time.since(start)
-	fmt.printf("merge_sort: %v\n", elapsed)
+	fmt.printf("merge_sort 1: %v\n", elapsed)
 
 	zs := slice.clone(xs[:])
 	defer delete(zs)
@@ -35,5 +45,12 @@ main :: proc() {
 	elapsed = time.since(start)
 	fmt.printf("merge_sort 2: %v\n", elapsed)
 
+	as := slice.clone(xs[:])
+	defer delete(as)
+	start = time.now()
+	merge_sort_3(as)
+	elapsed = time.since(start)
+	fmt.printf("merge_sort 3: %v\n", elapsed)
 
+	fmt.printf("add(%d, %d)=%d\n", 1, 2, math.add(1, 2))
 }

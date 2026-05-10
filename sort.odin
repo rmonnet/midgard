@@ -184,6 +184,7 @@ merge_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 		mid := lo + (hi - lo) / 2
 		sort(xs, aux, lo, mid)
 		sort(xs, aux, mid + 1, hi)
+		if !(xs[mid + 1] < xs[mid]) {return}
 		merge(xs, aux, lo, mid, hi)
 	}
 
@@ -242,6 +243,7 @@ merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 		mid := lo + (hi - lo) / 2
 		sort(xs, aux, lo, mid, less)
 		sort(xs, aux, mid + 1, hi, less)
+		if !(xs[mid + 1] < xs[mid]) {return}
 		merge(xs, aux, lo, mid, hi, less)
 	}
 

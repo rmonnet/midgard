@@ -94,19 +94,37 @@ bottom_merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 
 @(test)
 test_bottom_merge_sort :: proc(t: ^testing.T) {
-	test_sort_int_helper(t, proc(xs: []int) {bottom_merge_sort(xs)})
+
+	bottom_merge_sort_int :: proc(xs: []int) {bottom_merge_sort(xs)}
+
+	test_sort_int_helper(t, bottom_merge_sort_int)
 }
 
 @(test)
 test_bottom_merge_sort_large :: proc(t: ^testing.T) {
-	test_sort_float_helper(t, proc(xs: []f64) {bottom_merge_sort(xs)})
+
+	bottom_merge_sort_f64 :: proc(xs: []f64) {bottom_merge_sort(xs)}
+
+	test_sort_float_helper(t, bottom_merge_sort_f64)
 }
 
 @(test)
 test_bottom_merge_sort_by :: proc(t: ^testing.T) {
-	test_sort_by_string_helper(
-		t,
-		proc(xs: []string, less: proc(a, b: string) -> bool) {bottom_merge_sort_by(xs, less)},
-	)
+
+	bottom_merge_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
+		bottom_merge_sort_by(xs, less)
+	}
+
+	test_sort_by_string_helper(t, bottom_merge_sort_string_by)
+}
+
+@(test)
+test_bottom_merge_sort_by_reverse :: proc(t: ^testing.T) {
+
+	bottom_merge_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
+		bottom_merge_sort_by(xs, less)
+	}
+
+	test_sort_by_string_reverse_helper(t, bottom_merge_sort_string_by)
 }
 

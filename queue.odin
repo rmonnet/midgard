@@ -104,7 +104,7 @@ test_q_pop_empty :: proc(t: ^testing.T) {
 	testing.expect(t, !ok)
 }
 
-//@(test)
+@(test)
 test_q_pop_not_empty :: proc(t: ^testing.T) {
 
 	q: Queue(int)
@@ -113,10 +113,10 @@ test_q_pop_not_empty :: proc(t: ^testing.T) {
 	q_enqueue(&q, 2)
 	value, ok := q_dequeue(&q)
 	testing.expect(t, ok)
-	testing.expect_value(t, 1, value)
+	testing.expect_value(t, value, 1)
 	value, ok = q_dequeue(&q)
 	testing.expect(t, ok)
-	testing.expect_value(t, 1, value)
+	testing.expect_value(t, value, 2)
 	_, ok = q_dequeue(&q)
 	testing.expect(t, !ok)
 }

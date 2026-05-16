@@ -55,19 +55,37 @@ shell_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 
 @(test)
 test_shell_sort :: proc(t: ^testing.T) {
-	test_sort_int_helper(t, proc(xs: []int) {shell_sort(xs)})
+
+	shell_sort_int :: proc(xs: []int) {shell_sort(xs)}
+
+	test_sort_int_helper(t, shell_sort_int)
 }
 
 @(test)
 test_shell_sort_large :: proc(t: ^testing.T) {
-	test_sort_float_helper(t, proc(xs: []f64) {shell_sort(xs)})
+
+	shell_sort_f64 :: proc(xs: []f64) {shell_sort(xs)}
+
+	test_sort_float_helper(t, shell_sort_f64)
 }
 
 @(test)
 test_shell_sort_by :: proc(t: ^testing.T) {
-	test_sort_by_string_helper(
-		t,
-		proc(xs: []string, less: proc(a, b: string) -> bool) {shell_sort_by(xs, less)},
-	)
+
+	shell_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
+		shell_sort_by(xs, less)
+	}
+
+	test_sort_by_string_helper(t, shell_sort_string_by)
+}
+
+@(test)
+test_shell_sort_by_reverse :: proc(t: ^testing.T) {
+
+	shell_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
+		shell_sort_by(xs, less)
+	}
+
+	test_sort_by_string_reverse_helper(t, shell_sort_string_by)
 }
 

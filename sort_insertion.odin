@@ -43,19 +43,37 @@ insertion_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 
 @(test)
 test_insertion_sort :: proc(t: ^testing.T) {
-	test_sort_int_helper(t, proc(xs: []int) {insertion_sort(xs)})
+
+	insertion_sort_int :: proc(xs: []int) {insertion_sort(xs)}
+
+	test_sort_int_helper(t, insertion_sort_int)
 }
 
 @(test)
 test_insertion_sort_large :: proc(t: ^testing.T) {
-	test_sort_float_helper(t, proc(xs: []f64) {insertion_sort(xs)})
+
+	insertion_sort_f64 :: proc(xs: []f64) {insertion_sort(xs)}
+
+	test_sort_float_helper(t, insertion_sort_f64)
 }
 
 @(test)
 test_insertion_sort_by :: proc(t: ^testing.T) {
-	test_sort_by_string_helper(
-		t,
-		proc(xs: []string, less: proc(a, b: string) -> bool) {insertion_sort_by(xs, less)},
-	)
+
+	insertion_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
+		insertion_sort_by(xs, less)
+	}
+
+	test_sort_by_string_helper(t, insertion_sort_string_by)
+}
+
+@(test)
+test_insertion_sort_by_reverse :: proc(t: ^testing.T) {
+
+	insertion_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
+		insertion_sort_by(xs, less)
+	}
+
+	test_sort_by_string_reverse_helper(t, insertion_sort_string_by)
 }
 

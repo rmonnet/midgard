@@ -38,7 +38,7 @@ When multiple versions of the same data structure or algorithm is included, the 
   - [Quick_Union_Find](./union_find_quick.odin): Faster version using an array of nodes where each node points towards the root of the connected set.
   - [Weighted_Union_Find](./union_find_weigthed.odin): Faster version using an array of nodes where each node points towards the root of the connected set. When connecting two nodes, the root is selected as the root of the largest of the two sets to keep the depth of the tree shallow and speed up root lookup.
   - [Compressed_Union_Find](./union_find_compressed.odin): Faster version using an array of nodes where each node points towards the root of the connected set. When connecting two nodes, the root is selected as the root of the largest of the two sets to keep the depth of the tree shallow and speed up root lookup. When looking up a root, the tree is compressed by swapping each node root with its grand-parent root. Over time, this speeds up root lookup by decreasing the depth of the tree.
- - Stack: The classic Last In - First Out container.
+- Stack: The classic Last In - First Out container.
   - [Stack](./stack.odin): Stack implemented as a linked list.
   - [Array_Stack](./stack_array): Stack implemented as a growable array.
 - Queue: The classic First In - First Out container.

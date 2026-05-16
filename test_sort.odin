@@ -40,34 +40,11 @@ is_sorted :: proc(xs: []$T) -> bool {
 @(private)
 test_sort_int_helper :: proc(t: ^testing.T, sort: proc(_: []int), loc := #caller_location) {
 
-	xs := [?]int{17, 5, 20, 1, 12, 10, 18, 3, 9, 16, 2, 13, 14, 8, 7, 6, 4, 12, 2, 19, 15, 11}
-	expected := [?]int {
-		1,
-		2,
-		2,
-		3,
-		4,
-		5,
-		6,
-		7,
-		8,
-		9,
-		10,
-		11,
-		12,
-		12,
-		13,
-		14,
-		15,
-		16,
-		17,
-		18,
-		19,
-		20,
-	}
-	sort(xs[:])
+	xs := []int{17, 5, 20, 1, 12, 10, 18, 3, 9, 16, 2, 13, 14, 8, 7, 6, 4, 12, 2, 19, 15, 11}
+	expected := []int{1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 13, 14, 15, 16, 17, 18, 19, 20}
+	sort(xs)
 
-	expect_slices(t, xs[:], expected[:], loc)
+	expect_slices(t, xs, expected, loc)
 }
 
 @(private)
@@ -89,7 +66,7 @@ test_sort_by_string_helper :: proc(
 	loc := #caller_location,
 ) {
 
-	xs := [?]string {
+	xs := []string {
 		"q",
 		"e",
 		"t",
@@ -113,7 +90,7 @@ test_sort_by_string_helper :: proc(
 		"o",
 		"k",
 	}
-	expected := [?]string {
+	expected := []string {
 		"a",
 		"b",
 		"b",
@@ -137,9 +114,9 @@ test_sort_by_string_helper :: proc(
 		"s",
 		"t",
 	}
-	sort_by(xs[:], string_lt)
+	sort_by(xs, string_lt)
 
-	expect_string_slices(t, xs[:], expected[:], loc)
+	expect_string_slices(t, xs, expected, loc)
 }
 
 @(private)
@@ -149,7 +126,7 @@ test_sort_by_string_reverse_helper :: proc(
 	loc := #caller_location,
 ) {
 
-	xs := [?]string {
+	xs := []string {
 		"q",
 		"e",
 		"t",
@@ -173,7 +150,7 @@ test_sort_by_string_reverse_helper :: proc(
 		"o",
 		"k",
 	}
-	expected := [?]string {
+	expected := []string {
 		"t",
 		"s",
 		"r",
@@ -197,8 +174,8 @@ test_sort_by_string_reverse_helper :: proc(
 		"b",
 		"a",
 	}
-	sort_by(xs[:], string_gt)
+	sort_by(xs, string_gt)
 
-	expect_string_slices(t, xs[:], expected[:], loc)
+	expect_string_slices(t, xs, expected, loc)
 }
 

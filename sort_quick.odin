@@ -125,6 +125,52 @@ quick_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 	sort(xs, 0, len(xs) - 1, less)
 }
 
+// Select the k-th element of the xs slice. Note that this algorithm
+// will change the order of the elements in the input slice but not
+// in a fully ordered way.
+//
+// This algorithm uses the same strategy as Quick Sort.
+quick_select :: proc(xs: []$T, k: int) -> T where intrinsics.type_is_ordered(T) {
+
+	partition :: proc(xs: []T, lo, hi: int) -> int {
+
+		i := lo
+		j := hi + 1
+		ref := xs[lo]
+		for {
+			for {
+				i += 1
+				if !(xs[i] < ref) || (i == hi) {break}
+			}
+			for {
+				j -= 1
+				if !(ref < xs[j]) || (j == lo) {break}
+			}
+			if i >= j {break}
+			xs[i], xs[j] = xs[j], xs[i]
+		}
+		xs[lo], xs[j] = xs[j], xs[lo]
+		return j
+	}
+
+	// Make sure the array is randomized to avoid being in the worse case for performance.
+	shuffle(xs)
+	lo := 0
+	hi := len(xs) - 1
+	for hi > lo {
+		j := partition(xs, lo, hi)
+		switch {
+		case j < k:
+			lo = j + 1
+		case j > k:
+			hi = j - 1
+		case:
+			return xs[k]
+		}
+	}
+	return xs[k]
+}
+
 // -----------------------------------------------
 // Utilities
 // -----------------------------------------------
@@ -220,5 +266,16 @@ test_median_of_3_by :: proc(t: ^testing.T) {
 	testing.expect_value(t, median_index_of_3_by([]int{11, 12, 13}, 1, 2, 0, lt_int), 1)
 	testing.expect_value(t, median_index_of_3_by([]int{11, 12, 13}, 2, 0, 1, lt_int), 1)
 	testing.expect_value(t, median_index_of_3_by([]int{11, 12, 13}, 2, 1, 0, lt_int), 1)
+}
+
+@(test)
+test_quick_select :: proc(t: ^testing.T) {
+
+	xs := []int{17, 5, 20, 1, 12, 10, 18, 3, 9, 16, 2, 13, 14, 8, 7, 6, 4, 12, 2, 19, 15, 11}
+	// {1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 13, 14, 15, 16, 17, 18, 19, 20}
+
+	testing.expect_value(t, quick_select(xs, 0), 1)
+	testing.expect_value(t, quick_select(xs, 21), 20)
+	testing.expect_value(t, quick_select(xs, 10), 10)
 }
 

@@ -29,6 +29,7 @@ When multiple versions of the same data structure or algorithm is included, the 
   - [shell_sort](./sort_shell.odin): Sorts by sorting pairs of elements that are far apart from each other and progressively reducing the gap between elements to be compared. It is an optimization of insertion sort.
   - [merge_sort](./sort_merge.odin):  Sorts by recursively dividing the input array into two halves, recursively sorting the two halves and finally merging them back together to obtain the sorted array.
   - [bottom_merge_sort](./sort_bottom_merge.odin):  Sorts by iteratively sorting sub-arrays of the input array, using the merge sort merge algorithm and gradually building up to the two half of the array. 
+  - [quick_sort](./sort_quick.odin): Sorts by recursively partitioning the array into the sub-array of values smaller than a selected value and the sub-array of values larger than a selected value until all the values are sorted.
 - [Shuffle](./shuffle.odin): Shuffle the elements of an array with the result being uniformly distributed.
 
 ### Data Structures

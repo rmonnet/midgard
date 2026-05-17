@@ -18,15 +18,16 @@ package midgard
 import "base:intrinsics"
 import "core:testing"
 
-// Sort the xs slice in-place.
-quick_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
+// Sort the xs slice in place, using the `cmp()` procedure
+//  parameter to compare elements.
+quick_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
 
 	// The lower boundary size under which we use
 	// insertion sort instead as an optimization.
 	// This cuts off the number of recursive calls to quick_sort.
 	CUTOFF :: 10
 
-	partition :: proc(xs: []T, lo, hi: int) -> int {
+	partition :: proc(xs: []T, lo, hi: int, cmp: proc(a, b: T) -> Cmp) -> int {
 
 		i := lo
 		j := hi + 1
@@ -34,11 +35,11 @@ quick_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 		for {
 			for {
 				i += 1
-				if !(xs[i] < ref) || (i == hi) {break}
+				if cmp(xs[i], ref) != .Less || (i == hi) {break}
 			}
 			for {
 				j -= 1
-				if !(ref < xs[j]) || (j == lo) {break}
+				if cmp(ref, xs[j]) != .Less || (j == lo) {break}
 			}
 			if i >= j {break}
 			xs[i], xs[j] = xs[j], xs[i]
@@ -47,82 +48,82 @@ quick_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
 		return j
 	}
 
-	sort :: proc(xs: []T, lo, hi: int) {
+	sort :: proc(xs: []T, lo, hi: int, cmp: proc(a, b: T) -> Cmp) {
 
 		// Optimization: If the array is small use insertion sort since
 		// it has less overhead.
 		if (hi - lo + 1) <= CUTOFF {
-			insertion_sort(xs[lo:hi + 1])
+			insertion_sort(xs[lo:hi + 1], cmp)
 			return
 		}
 
 		// Optimization: pick the median of 3 samples across the array
 		// to get a better balance between the two sub-arrays.
-		mi := median_index_of_3(xs, lo, lo + (hi - lo) / 2, hi)
+		mi := median_index_of_3(xs, lo, lo + (hi - lo) / 2, hi, cmp)
 		xs[lo], xs[mi] = xs[mi], xs[lo]
 
-		j := partition(xs, lo, hi)
-		sort(xs, lo, j - 1)
-		sort(xs, j + 1, hi)
+		j := partition(xs, lo, hi, cmp)
+		sort(xs, lo, j - 1, cmp)
+		sort(xs, j + 1, hi, cmp)
 	}
 
 	// Make sure the array is randomized to avoid being in the worse case for performance.
 	shuffle(xs)
-	sort(xs, 0, len(xs) - 1)
+	sort(xs, 0, len(xs) - 1, cmp)
 }
 
-// Sort the xs slice in place, using the `less()` procedure
+// Sort the xs slice in place, using the `cmp()` procedure
 //  parameter to compare elements.
-quick_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
+//
+// This version of the quick sort algorithm is optimized for
+// cases where the array contains multiple duplicate keys.
+// It avoid falling in the worst case (O(N^2)).
+three_way_quick_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
 
 	// The lower boundary size under which we use
 	// insertion sort instead as an optimization.
 	// This cuts off the number of recursive calls to quick_sort.
 	CUTOFF :: 10
 
-	partition :: proc(xs: []T, lo, hi: int, less: proc(a, b: T) -> bool) -> int {
-
-		i := lo
-		j := hi + 1
-		ref := xs[lo]
-		for {
-			for {
-				i += 1
-				if !less(xs[i], ref) || (i == hi) {break}
-			}
-			for {
-				j -= 1
-				if !less(ref, xs[j]) || (j == lo) {break}
-			}
-			if i >= j {break}
-			xs[i], xs[j] = xs[j], xs[i]
-		}
-		xs[lo], xs[j] = xs[j], xs[lo]
-		return j
-	}
-
-	sort :: proc(xs: []T, lo, hi: int, less: proc(a, b: T) -> bool) {
+	sort :: proc(xs: []T, lo, hi: int, cmp: proc(a, b: T) -> Cmp) {
 
 		// Optimization: If the array is small use insertion sort since
 		// it has less overhead.
 		if (hi - lo + 1) <= CUTOFF {
-			insertion_sort_by(xs[lo:hi + 1], less)
+			insertion_sort(xs[lo:hi + 1], cmp)
 			return
 		}
 
 		// Optimization: pick the median of 3 samples across the array
 		// to get a better balance between the two sub-arrays.
-		mi := median_index_of_3_by(xs, lo, lo + (hi - lo) / 2, hi, less)
+		mi := median_index_of_3(xs, lo, lo + (hi - lo) / 2, hi, cmp)
 		xs[lo], xs[mi] = xs[mi], xs[lo]
 
-		j := partition(xs, lo, hi, less)
-		sort(xs, lo, j - 1, less)
-		sort(xs, j + 1, hi, less)
+		lt := lo
+		gt := hi
+		ref := xs[lo]
+		i := lo
+		for i <= gt {
+			switch cmp(xs[i], ref) {
+			case .Less:
+				xs[lt], xs[i] = xs[i], xs[lt]
+				lt += 1
+				i += 1
+			case .Greater:
+				xs[i], xs[gt] = xs[gt], xs[i]
+				gt -= 1
+			case .Equal:
+				i += 1
+			}
+		}
+
+		sort(xs, lo, lt - 1, cmp)
+		sort(xs, gt + 1, hi, cmp)
 	}
 
 	// Make sure the array is randomized to avoid being in the worse case for performance.
 	shuffle(xs)
-	sort(xs, 0, len(xs) - 1, less)
+	sort(xs, 0, len(xs) - 1, cmp)
 }
 
 // Select the k-th element of the xs slice. Note that this algorithm
@@ -130,9 +131,9 @@ quick_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 // in a fully ordered way.
 //
 // This algorithm uses the same strategy as Quick Sort.
-quick_select :: proc(xs: []$T, k: int) -> T where intrinsics.type_is_ordered(T) {
+quick_select :: proc(xs: []$T, k: int, cmp: proc(a, b: T) -> Cmp) -> T {
 
-	partition :: proc(xs: []T, lo, hi: int) -> int {
+	partition :: proc(xs: []T, lo, hi: int, cmp: proc(a, b: T) -> Cmp) -> int {
 
 		i := lo
 		j := hi + 1
@@ -140,11 +141,11 @@ quick_select :: proc(xs: []$T, k: int) -> T where intrinsics.type_is_ordered(T) 
 		for {
 			for {
 				i += 1
-				if !(xs[i] < ref) || (i == hi) {break}
+				if cmp(xs[i], ref) != .Less || (i == hi) {break}
 			}
 			for {
 				j -= 1
-				if !(ref < xs[j]) || (j == lo) {break}
+				if cmp(ref, xs[j]) != .Less || (j == lo) {break}
 			}
 			if i >= j {break}
 			xs[i], xs[j] = xs[j], xs[i]
@@ -158,7 +159,7 @@ quick_select :: proc(xs: []$T, k: int) -> T where intrinsics.type_is_ordered(T) 
 	lo := 0
 	hi := len(xs) - 1
 	for hi > lo {
-		j := partition(xs, lo, hi)
+		j := partition(xs, lo, hi, cmp)
 		switch {
 		case j < k:
 			lo = j + 1
@@ -175,31 +176,17 @@ quick_select :: proc(xs: []$T, k: int) -> T where intrinsics.type_is_ordered(T) 
 // Utilities
 // -----------------------------------------------
 
-// Compute the median of 3 values.
-median_index_of_3 :: proc(xs: []$T, lo, mid, hi: int) -> int where intrinsics.type_is_ordered(T) {
-
-	if xs[lo] < xs[mid] {
-		if xs[mid] < xs[hi] {return mid}
-		if xs[lo] < xs[hi] {return hi}
-		return lo
-	} else {
-		if xs[lo] < xs[hi] {return lo}
-		if xs[mid] < xs[hi] {return hi}
-		return mid
-	}
-}
-
 // Compute the median of 3 values, using the `less()` procedure
 //  parameter to compare elements.
-median_index_of_3_by :: proc(xs: []$T, lo, mid, hi: int, less: proc(a, b: T) -> bool) -> int {
+median_index_of_3 :: proc(xs: []$T, lo, mid, hi: int, cmp: proc(a, b: T) -> Cmp) -> int {
 
-	if less(xs[lo], xs[mid]) {
-		if less(xs[mid], xs[hi]) {return mid}
-		if less(xs[lo], xs[hi]) {return hi}
+	if cmp(xs[lo], xs[mid]) == .Less {
+		if cmp(xs[mid], xs[hi]) == .Less {return mid}
+		if cmp(xs[lo], xs[hi]) == .Less {return hi}
 		return lo
 	} else {
-		if less(xs[lo], xs[hi]) {return lo}
-		if less(xs[mid], xs[hi]) {return hi}
+		if cmp(xs[lo], xs[hi]) == .Less {return lo}
+		if cmp(xs[mid], xs[hi]) == .Less {return hi}
 		return mid
 	}
 }
@@ -209,73 +196,94 @@ median_index_of_3_by :: proc(xs: []$T, lo, mid, hi: int, less: proc(a, b: T) -> 
 // -----------------------------------------------
 
 @(test)
-test_quick_sort :: proc(t: ^testing.T) {
+test_quick_sort_int :: proc(t: ^testing.T) {
 
-	quick_sort_int :: proc(xs: []int) {quick_sort(xs)}
+	quick_sort_int :: proc(xs: []int) {quick_sort(xs, cmp_int)}
 
 	test_sort_int_helper(t, quick_sort_int)
 }
 
 @(test)
-test_quick_sort_large :: proc(t: ^testing.T) {
+test_quick_sort_f64 :: proc(t: ^testing.T) {
 
-	quick_sort_f64 :: proc(xs: []f64) {quick_sort(xs)}
+	quick_sort_f64 :: proc(xs: []f64) {quick_sort(xs, cmp_f64)}
 
 	test_sort_float_helper(t, quick_sort_f64)
 }
 
 @(test)
-test_quick_sort_by :: proc(t: ^testing.T) {
+test_quick_sort_string :: proc(t: ^testing.T) {
 
-	quick_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
-		quick_sort_by(xs, less)
-	}
+	quick_sort_string :: proc(xs: []string) {quick_sort(xs, cmp_string)}
 
-	test_sort_by_string_helper(t, quick_sort_string_by)
+	test_sort_string_helper(t, quick_sort_string)
 }
 
 @(test)
-test_quick_sort_by_reverse :: proc(t: ^testing.T) {
+test_quick_sort_string_reverse :: proc(t: ^testing.T) {
 
-	quick_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
-		quick_sort_by(xs, less)
-	}
+	quick_sort_string_reverse :: proc(xs: []string) {quick_sort(xs, cmp_string_reverse)}
 
-	test_sort_by_string_reverse_helper(t, quick_sort_string_by)
+	test_sort_string_reverse_helper(t, quick_sort_string_reverse)
 }
 
 @(test)
 test_median_of_3 :: proc(t: ^testing.T) {
 
-	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 0, 1, 2), 1)
-	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 0, 2, 1), 1)
-	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 1, 0, 2), 1)
-	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 1, 2, 0), 1)
-	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 2, 0, 1), 1)
-	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 2, 1, 0), 1)
-}
-
-@(test)
-test_median_of_3_by :: proc(t: ^testing.T) {
-
-	lt_int :: proc(a, b: int) -> bool {return a < b}
-
-	testing.expect_value(t, median_index_of_3_by([]int{11, 12, 13}, 0, 1, 2, lt_int), 1)
-	testing.expect_value(t, median_index_of_3_by([]int{11, 12, 13}, 0, 2, 1, lt_int), 1)
-	testing.expect_value(t, median_index_of_3_by([]int{11, 12, 13}, 1, 0, 2, lt_int), 1)
-	testing.expect_value(t, median_index_of_3_by([]int{11, 12, 13}, 1, 2, 0, lt_int), 1)
-	testing.expect_value(t, median_index_of_3_by([]int{11, 12, 13}, 2, 0, 1, lt_int), 1)
-	testing.expect_value(t, median_index_of_3_by([]int{11, 12, 13}, 2, 1, 0, lt_int), 1)
+	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 0, 1, 2, cmp_int), 1)
+	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 0, 2, 1, cmp_int), 1)
+	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 1, 0, 2, cmp_int), 1)
+	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 1, 2, 0, cmp_int), 1)
+	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 2, 0, 1, cmp_int), 1)
+	testing.expect_value(t, median_index_of_3([]int{11, 12, 13}, 2, 1, 0, cmp_int), 1)
 }
 
 @(test)
 test_quick_select :: proc(t: ^testing.T) {
 
+	quick_select_int :: proc(xs: []int, k: int) -> int {return quick_select(xs, k, cmp_int)}
+
 	xs := []int{17, 5, 20, 1, 12, 10, 18, 3, 9, 16, 2, 13, 14, 8, 7, 6, 4, 12, 2, 19, 15, 11}
+	// the sorted array:
 	// {1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 12, 13, 14, 15, 16, 17, 18, 19, 20}
 
-	testing.expect_value(t, quick_select(xs, 0), 1)
-	testing.expect_value(t, quick_select(xs, 21), 20)
-	testing.expect_value(t, quick_select(xs, 10), 10)
+	testing.expect_value(t, quick_select_int(xs, 0), 1)
+	testing.expect_value(t, quick_select_int(xs, 21), 20)
+	testing.expect_value(t, quick_select_int(xs, 10), 10)
+}
+
+@(test)
+test_three_way_quick_sort_int :: proc(t: ^testing.T) {
+
+	three_way_quick_sort_int :: proc(xs: []int) {three_way_quick_sort(xs, cmp_int)}
+
+	test_sort_int_helper(t, three_way_quick_sort_int)
+}
+
+@(test)
+test_three_way_quick_sort_f64 :: proc(t: ^testing.T) {
+
+	three_way_quick_sort_f64 :: proc(xs: []f64) {three_way_quick_sort(xs, cmp_f64)}
+
+	test_sort_float_helper(t, three_way_quick_sort_f64)
+}
+
+@(test)
+test_three_way_quick_sort_string :: proc(t: ^testing.T) {
+
+	three_way_quick_sort_string :: proc(xs: []string) {three_way_quick_sort(xs, cmp_string)}
+
+	test_sort_string_helper(t, three_way_quick_sort_string)
+}
+
+@(test)
+test_three_way_quick_sort_string_reverse :: proc(t: ^testing.T) {
+
+	three_way_quick_sort_string_reverse :: proc(xs: []string) {three_way_quick_sort(
+			xs,
+			cmp_string_reverse,
+		)}
+
+	test_sort_string_reverse_helper(t, three_way_quick_sort_string_reverse)
 }
 

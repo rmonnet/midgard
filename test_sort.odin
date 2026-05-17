@@ -15,18 +15,6 @@ fill_int_array :: proc($N: int) -> [N]int {
 }
 
 @(private)
-string_lt :: proc(a, b: string) -> bool {
-
-	return a < b
-}
-
-@(private)
-string_gt :: proc(a, b: string) -> bool {
-
-	return b < a
-}
-
-@(private)
 is_sorted :: proc(xs: []$T) -> bool {
 
 	for i in 0 ..< len(xs) - 1 {
@@ -60,11 +48,7 @@ test_sort_float_helper :: proc(t: ^testing.T, sort: proc(_: []f64), loc := #call
 }
 
 @(private)
-test_sort_by_string_helper :: proc(
-	t: ^testing.T,
-	sort_by: proc(_: []string, _: proc(a, b: string) -> bool),
-	loc := #caller_location,
-) {
+test_sort_string_helper :: proc(t: ^testing.T, sort: proc(_: []string), loc := #caller_location) {
 
 	xs := []string {
 		"q",
@@ -114,15 +98,15 @@ test_sort_by_string_helper :: proc(
 		"s",
 		"t",
 	}
-	sort_by(xs, string_lt)
+	sort(xs)
 
 	expect_string_slices(t, xs, expected, loc)
 }
 
 @(private)
-test_sort_by_string_reverse_helper :: proc(
+test_sort_string_reverse_helper :: proc(
 	t: ^testing.T,
-	sort_by: proc(_: []string, _: proc(a, b: string) -> bool),
+	sort_reverse: proc(_: []string),
 	loc := #caller_location,
 ) {
 
@@ -174,7 +158,7 @@ test_sort_by_string_reverse_helper :: proc(
 		"b",
 		"a",
 	}
-	sort_by(xs, string_gt)
+	sort_reverse(xs)
 
 	expect_string_slices(t, xs, expected, loc)
 }

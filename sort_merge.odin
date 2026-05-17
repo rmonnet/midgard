@@ -16,68 +16,16 @@ package midgard
 import "base:intrinsics"
 import "core:testing"
 
-// Sort the xs slice in-place.
-merge_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
-
-	// The lower boundary size under which we use
-	// insertion sort instead as an optimization.
-	// This cuts off the number of recursive calls to merge_sort.
-	CUTOFF :: 7
-
-	merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int) {
-
-		copy(aux[lo:hi + 1], xs[lo:hi + 1])
-		i := lo
-		j := mid + 1
-		for k in lo ..= hi {
-			if i > mid {
-				xs[k] = aux[j]
-				j += 1
-			} else if j > hi {
-				xs[k] = aux[i]
-				i += 1
-			} else if aux[j] < aux[i] {
-				xs[k] = aux[j]
-				j += 1
-			} else {
-				xs[k] = aux[i]
-				i += 1
-			}
-		}
-	}
-
-	sort :: proc(xs: []$T, aux: []T, lo: int, hi: int) {
-
-		// Optimization: If the array is small use insertion sort since
-		// it has less overhead.
-		if (hi - lo + 1) <= CUTOFF {
-			insertion_sort(xs[lo:hi + 1])
-			return
-		}
-
-		mid := lo + (hi - lo) / 2
-		sort(xs, aux, lo, mid)
-		sort(xs, aux, mid + 1, hi)
-		if !(xs[mid + 1] < xs[mid]) {return}
-		merge(xs, aux, lo, mid, hi)
-	}
-
-
-	aux := make([]T, len(xs))
-	defer delete(aux)
-	sort(xs, aux, 0, len(xs) - 1)
-}
-
-// Sort the xs slice in place, using the `less()` procedure
+// Sort the xs slice in place, using the `cmp()` procedure
 //  parameter to compare elements.
-merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
+merge_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
 
 	// The lower boundary size under which we use
 	// insertion sort instead as an optimization.
 	// This cuts off the number of recursive calls to merge_sort.
 	CUTOFF :: 7
 
-	merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int, less: proc(a, b: T) -> bool) {
+	merge :: proc(xs: []$T, aux: []T, lo: int, mid: int, hi: int, cmp: proc(a, b: T) -> Cmp) {
 
 		copy(aux[lo:hi + 1], xs[lo:hi + 1])
 		i := lo
@@ -89,7 +37,7 @@ merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 			} else if j > hi {
 				xs[k] = aux[i]
 				i += 1
-			} else if less(aux[j], aux[i]) {
+			} else if cmp(aux[j], aux[i]) == .Less {
 				xs[k] = aux[j]
 				j += 1
 			} else {
@@ -99,26 +47,26 @@ merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 		}
 	}
 
-	sort :: proc(xs: []$T, aux: []T, lo: int, hi: int, less: proc(a, b: T) -> bool) {
+	sort :: proc(xs: []$T, aux: []T, lo: int, hi: int, cmp: proc(a, b: T) -> Cmp) {
 
 		// Optimization: If the array is small use insertion sort since
 		// it has less overhead.
 		if (hi - lo + 1) <= CUTOFF {
-			insertion_sort_by(xs[lo:hi + 1], less)
+			insertion_sort(xs[lo:hi + 1], cmp)
 			return
 		}
 
 		mid := lo + (hi - lo) / 2
-		sort(xs, aux, lo, mid, less)
-		sort(xs, aux, mid + 1, hi, less)
-		if !less(xs[mid + 1], xs[mid]) {return}
-		merge(xs, aux, lo, mid, hi, less)
+		sort(xs, aux, lo, mid, cmp)
+		sort(xs, aux, mid + 1, hi, cmp)
+		if cmp(xs[mid + 1], xs[mid]) != .Less {return}
+		merge(xs, aux, lo, mid, hi, cmp)
 	}
 
 
 	aux := make([]T, len(xs))
 	defer delete(aux)
-	sort(xs, aux, 0, len(xs) - 1, less)
+	sort(xs, aux, 0, len(xs) - 1, cmp)
 }
 
 // -----------------------------------------------
@@ -126,38 +74,34 @@ merge_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 // -----------------------------------------------
 
 @(test)
-test_merge_sort :: proc(t: ^testing.T) {
+test_merge_sort_int :: proc(t: ^testing.T) {
 
-	merge_sort_int :: proc(xs: []int) {merge_sort(xs)}
+	merge_sort_int :: proc(xs: []int) {merge_sort(xs, cmp_int)}
 
 	test_sort_int_helper(t, merge_sort_int)
 }
 
 @(test)
-test_merge_sort_large :: proc(t: ^testing.T) {
+test_merge_sort_f64 :: proc(t: ^testing.T) {
 
-	merge_sort_f64 :: proc(xs: []f64) {merge_sort(xs)}
+	merge_sort_f64 :: proc(xs: []f64) {merge_sort(xs, cmp_f64)}
 
 	test_sort_float_helper(t, merge_sort_f64)
 }
 
 @(test)
-test_merge_sort_by :: proc(t: ^testing.T) {
+test_merge_sort_string :: proc(t: ^testing.T) {
 
-	merge_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
-		merge_sort_by(xs, less)
-	}
+	merge_sort_string :: proc(xs: []string) {merge_sort(xs, cmp_string)}
 
-	test_sort_by_string_helper(t, merge_sort_string_by)
+	test_sort_string_helper(t, merge_sort_string)
 }
 
 @(test)
-test_merge_sort_by_reverse :: proc(t: ^testing.T) {
+test_merge_sort_string_reverse :: proc(t: ^testing.T) {
 
-	merge_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
-		merge_sort_by(xs, less)
-	}
+	merge_sort_string_reverse :: proc(xs: []string) {merge_sort(xs, cmp_string_reverse)}
 
-	test_sort_by_string_reverse_helper(t, merge_sort_string_by)
+	test_sort_string_reverse_helper(t, merge_sort_string_reverse)
 }
 

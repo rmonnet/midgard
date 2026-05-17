@@ -14,24 +14,13 @@ import "base:intrinsics"
 import "core:testing"
 
 
-// Sort the xs slice in-place.
-insertion_sort :: proc(xs: []$T) where intrinsics.type_is_ordered(T) {
-
-	for i in 0 ..< len(xs) {
-		for j := i; j > 0; j -= 1 {
-			if !(xs[j] < xs[j - 1]) {break}
-			xs[j], xs[j - 1] = xs[j - 1], xs[j]
-		}
-	}
-}
-
-// Sort the xs slice in place, using the `less()` procedure
+// Sort the xs slice in place, using the `cmp()` procedure
 //  parameter to compare elements.
-insertion_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
+insertion_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
 
 	for i in 0 ..< len(xs) {
 		for j := i; j > 0; j -= 1 {
-			if !less(xs[j], xs[j - 1]) {break}
+			if cmp(xs[j], xs[j - 1]) != .Less {break}
 			xs[j], xs[j - 1] = xs[j - 1], xs[j]
 		}
 	}
@@ -44,36 +33,32 @@ insertion_sort_by :: proc(xs: []$T, less: proc(a, b: T) -> bool) {
 @(test)
 test_insertion_sort :: proc(t: ^testing.T) {
 
-	insertion_sort_int :: proc(xs: []int) {insertion_sort(xs)}
+	insertion_sort_int :: proc(xs: []int) {insertion_sort(xs, cmp_int)}
 
 	test_sort_int_helper(t, insertion_sort_int)
 }
 
 @(test)
-test_insertion_sort_large :: proc(t: ^testing.T) {
+test_insertion_sort_f64 :: proc(t: ^testing.T) {
 
-	insertion_sort_f64 :: proc(xs: []f64) {insertion_sort(xs)}
+	insertion_sort_f64 :: proc(xs: []f64) {insertion_sort(xs, cmp_f64)}
 
 	test_sort_float_helper(t, insertion_sort_f64)
 }
 
 @(test)
-test_insertion_sort_by :: proc(t: ^testing.T) {
+test_insertion_sort_string :: proc(t: ^testing.T) {
 
-	insertion_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
-		insertion_sort_by(xs, less)
-	}
+	insertion_sort_string :: proc(xs: []string) {insertion_sort(xs, cmp_string)}
 
-	test_sort_by_string_helper(t, insertion_sort_string_by)
+	test_sort_string_helper(t, insertion_sort_string)
 }
 
 @(test)
-test_insertion_sort_by_reverse :: proc(t: ^testing.T) {
+test_insertion_sort_string_reverse :: proc(t: ^testing.T) {
 
-	insertion_sort_string_by :: proc(xs: []string, less: proc(_, _: string) -> bool) {
-		insertion_sort_by(xs, less)
-	}
+	insertion_sort_string_reverse :: proc(xs: []string) {insertion_sort(xs, cmp_string_reverse)}
 
-	test_sort_by_string_reverse_helper(t, insertion_sort_string_by)
+	test_sort_string_reverse_helper(t, insertion_sort_string_reverse)
 }
 

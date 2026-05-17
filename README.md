@@ -47,6 +47,8 @@ When multiple versions of the same data structure or algorithm is included, the 
 - Queue: The classic First In - First Out container.
   - [Queue](./queue.odin): Queue implemented as a linked list.
   - [Array_Queue](./queue_array.odin): Queue implemented as a growable array.
+- Priority Queue: A Queue where the elements are retrieved in priority order, the element with the maximum (or minimum) value first.
+  - [Binary_Heap](.binary_heap.odin): A Priority Queue based on a binary tree, itself implemented using an array.
 
 ## To Do
 

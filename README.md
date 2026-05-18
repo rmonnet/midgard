@@ -30,7 +30,8 @@ When multiple versions of the same data structure or algorithm is included, the 
   - [merge_sort](./sort_merge.odin):  Sorts by recursively dividing the input array into two halves, recursively sorting the two halves and finally merging them back together to obtain the sorted array.
   - [bottom_merge_sort](./sort_bottom_merge.odin):  Sorts by iteratively sorting sub-arrays of the input array, using the merge sort merge algorithm and gradually building up to the two half of the array. 
   - [quick_sort](./sort_quick.odin): Sorts by recursively partitioning the array into the sub-array of values smaller than a selected value and the sub-array of values larger than a selected value until all the values are sorted.
-  - [three_way_quick_sort](./sort_quick.odin): The is a variant of `quick_sort` optimized for cases where the array contains several duplicate keys.
+  - [three_way_quick_sort](./sort_quick.odin): This a variant of `quick_sort` optimized for cases where the array contains several duplicate keys.
+  - [heap_sort](./sort_hep.odin): Sort the array using the Binary Heap algorithm. It convert the array into a max binary heap and then copying the heap elements, largest to the end of the array and iteratively with the remaining largest.
 - [quick_select](./sort_quick.odin): Select the k-th element of an array without sorting it. The k-th element represents the element that would be in k position after sorting the array (k=0 => min, k=len-1 => max, k=len/2 => median) 
 - [shuffle](./shuffle.odin): Shuffle the elements of an array with the result being uniformly distributed.
 

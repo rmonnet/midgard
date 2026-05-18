@@ -3,6 +3,8 @@
 // is larger than its two children.
 // During insertion and deletion, the tree is re-balanced to keep the ordering property valid.
 // In this implementation, the largest element is stored at the top of the tree.
+//
+// This implementation assumes that they values in the Priority Queue are immutables.
 package midgard
 
 import "core:testing"

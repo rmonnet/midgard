@@ -16,6 +16,15 @@ You need to install the [Odin compiler](https://odin-lang.org/).
 If you are using [VSCode](https://code.visualstudio.com/), I recommend the Odin Language extension by Daniel Gavin ('danielgavin.ols').
 I have switched to [Zed](https://zed.dev/) with the Odin extension because I found it better for visualizing program states when debugging.
 
+For running tasks, this project uses [just](https://just.systems/man/en/introduction.html). It is similar to make but simpler.
+You can install it using (`brew install just` on macOS, `scoop install just` on Windows11, or your Linux distro package manager).
+You can also install with `cargo install just` if you have the Rust toolchain installed and don't mind the extra space taken by the downloaded dependencies.
+
+To count lines of code, this project uses [tokei](https://github.com/XAMPPRocky/tokei).
+You can install it using (`brew install tokei` on macOS, `scoop install tpkei` on Windows11, or your Linux distro package manager).
+You can also install with `cargo install tokei` if you have the Rust toolchain installed and don't mind the extra space taken by the downloaded dependencies.
+
+
 ## Algorithms and Data Structures
 
 Here is a quick summary of the collection of algorithms and data structures.

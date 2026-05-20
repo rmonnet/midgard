@@ -4,11 +4,13 @@ import "core:fmt"
 
 main :: proc() {
 
-	m: Map(int, string)
-	defer map_destroy(&m)
-	map_put(&m, 1, "one")
-	map_put(&m, 2, "two")
-	map_put(&m, 3, "three")
-	fmt.println(map_size(m))
+	sentence := "SEARCHEXAMPLE"
+	m: Ordered_Map(rune, int)
+	defer ordered_map_destroy(&m)
+
+	for letter, index in sentence {
+		ordered_map_put(&m, letter, index)
+	}
+	fmt.println(ordered_map_keys(m))
 }
 

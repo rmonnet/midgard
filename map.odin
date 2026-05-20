@@ -1,6 +1,6 @@
-// This files implement a Naive Map. The Map structure stored (key, value) pairs
-// where the keys are considered immutable. This naive implementation store
-// all the values as a linked list. This implementation doesn't support
+// This files implement a Map. The Map structure stores (key, value) pairs
+// where the keys are considered immutable. This implementation stores
+// all the values as a linked list. It doesn't support
 // dynamically allocated keys, only dynamically allocated values.
 //
 // If the type of the values is dynamically allocated and a value is returned
@@ -9,11 +9,12 @@
 // The search and insert have a worst case of O(N).
 package midgard
 
+import "base:intrinsics"
 import "core:slice"
 import "core:testing"
 
 // Map defines the type holding the set of (key, value) pairs.
-Map :: struct($K: typeid, $V: typeid) {
+Map :: struct($K: typeid, $V: typeid) where intrinsics.type_is_comparable(K) {
 	head: ^Linked_List_Node(Pair(K, V)),
 }
 
@@ -56,25 +57,20 @@ map_destroy :: proc {
 // value if it exists. If it doesn't, it set ok to false.
 map_put :: proc(m: ^Map($K, $V), key: K, value: V) -> (old_value: V, ok: bool) {
 
-	prev_node: ^Linked_List_Node(Pair(K, V))
 	for node := m.head; node != nil; node = node.next {
 		if node.element.first == key {
 			old_value = node.element.second
 			node.element.second = value
 			return old_value, true
 		}
-		prev_node = node
 	}
 	new_node := new(Linked_List_Node(Pair(K, V)))
 	new_node.element = {
 		first  = key,
 		second = value,
 	}
-	if prev_node == nil {
-		m.head = new_node
-	} else {
-		prev_node.next = new_node
-	}
+	new_node.next = m.head
+	m.head = new_node
 	return
 }
 
@@ -178,6 +174,7 @@ test_map_size :: proc(t: ^testing.T) {
 	map_put(&m, 1, "one")
 	map_put(&m, 2, "two")
 	map_put(&m, 3, "three")
+	map_put(&m, 2, "two_again")
 
 	testing.expect_value(t, map_size(m), 3)
 }
@@ -219,6 +216,10 @@ test_map_get :: proc(t: ^testing.T) {
 	testing.expect(t, ok)
 	testing.expect_value(t, value, "one")
 
+	value, ok = map_get(m, 3)
+	testing.expect(t, ok)
+	testing.expect_value(t, value, "three")
+
 	value, ok = map_get(m, 0)
 	testing.expect(t, !ok)
 }
@@ -235,13 +236,20 @@ test_map_delete :: proc(t: ^testing.T) {
 	value, ok := map_delete(&m, 1)
 	testing.expect(t, ok)
 	testing.expect_value(t, value, "one")
+	testing.expect(t, !map_contains(m, 1))
+	testing.expect_value(t, map_size(m), 2)
 
 	value, ok = map_delete(&m, 1)
 	testing.expect(t, !ok)
-	testing.expect(t, !map_contains(m, 1))
 
 	value, ok = map_delete(&m, 0)
 	testing.expect(t, !ok)
+
+	value, ok = map_delete(&m, 3)
+	testing.expect(t, ok)
+	testing.expect_value(t, value, "three")
+	testing.expect(t, !map_contains(m, 3))
+	testing.expect_value(t, map_size(m), 1)
 }
 
 @(test)

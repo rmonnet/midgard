@@ -55,7 +55,7 @@ When multiple versions of the same data structure or algorithm is included, the 
   - [Weighted_Union_Find](./union_find_weigthed.odin): Faster version using an array of nodes where each node points towards the root of the connected set. When connecting two nodes, the root is selected as the root of the largest of the two sets to keep the depth of the tree shallow and speed up root lookup.
 - Map: A Map allows the storage and retrieval of the value associated with a specific key.
   - [Map](./map.odin): A simple implementation of a Map using a linked list of (key, value) pairs.
-  - [Ordered_Map](./ordered_map.odin): An implementation of a Map using a sorted array of (key, value) pairs and binary search to find a key in the array.
+  - [Ordered_Map](./map_ordered.odin): An implementation of a Map using a sorted array of (key, value) pairs and binary search to find a key in the array.
 - Priority Queue: A Queue where the elements are retrieved in priority order, the element with the maximum (or minimum) value first.
   - [Binary_Heap](.binary_heap.odin): A Priority Queue based on a binary tree, itself implemented using an array.
 - Queue: The classic First In - First Out container.
@@ -68,7 +68,7 @@ When multiple versions of the same data structure or algorithm is included, the 
 ## To Do
 
 - [ ] Implement the Convex Hull Algorithm (Sedgewick Algorithms, Lecture 4)
-- [ ] Implement the Bouncing Ball simulation using a Priotiry Queue (Sedgewick Algorithms, Lecture 7)
+- [ ] Implement the Bouncing Ball simulation using a Priority Queue (Sedgewick Algorithms, Lecture 7)
 
 ## License and Copyright
 

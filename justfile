@@ -4,12 +4,17 @@ _list-recipes:
 
 # Count the SLOCs in the project
 slocs:
-    tokei ./ ./math/
+    tokei ./
+    @echo ""
+    tokei ./math/
+    @echo ""
+    tokei ./test/
 
 # Run all the tests in the project
 test:
     -odin test math -vet -disallow-do -define:ODIN_TEST_SHORT_LOGS=true -define:ODIN_TEST_LOG_LEVEL=warning
     -odin test . -vet -disallow-do -define:ODIN_TEST_SHORT_LOGS=true -define:ODIN_TEST_LOG_LEVEL=warning
+    -odin test test -vet -disallow-do -define:ODIN_TEST_SHORT_LOGS=true -define:ODIN_TEST_LOG_LEVEL=warning
 
 # Run the single specified test (<package name>.<test name>)
 test-single name:

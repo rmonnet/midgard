@@ -14,9 +14,6 @@
 // for the auxiliary array.
 package midgard
 
-import "base:intrinsics"
-import "core:testing"
-
 // Sort the xs slice in place, using the `cmp()` procedure
 //  parameter to compare elements.
 bottom_merge_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
@@ -51,44 +48,5 @@ bottom_merge_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
 			merge(xs, aux, lo, lo + size - 1, min(lo + 2 * size - 1, len(xs) - 1), cmp)
 		}
 	}
-}
-
-// -----------------------------------------------
-// Tests
-// -----------------------------------------------
-
-@(test)
-test_bottom_merge_sort_int :: proc(t: ^testing.T) {
-
-	bottom_merge_sort_int :: proc(xs: []int) {bottom_merge_sort(xs, cmp_int)}
-
-	test_sort_int_helper(t, bottom_merge_sort_int)
-}
-
-@(test)
-test_bottom_merge_sort_f64 :: proc(t: ^testing.T) {
-
-	bottom_merge_sort_f64 :: proc(xs: []f64) {bottom_merge_sort(xs, cmp_f64)}
-
-	test_sort_float_helper(t, bottom_merge_sort_f64)
-}
-
-@(test)
-test_bottom_merge_sort_string :: proc(t: ^testing.T) {
-
-	bottom_merge_sort_string :: proc(xs: []string) {bottom_merge_sort(xs, cmp_string)}
-
-	test_sort_string_helper(t, bottom_merge_sort_string)
-}
-
-@(test)
-test_bottom_merge_sort_by_reverse :: proc(t: ^testing.T) {
-
-	bottom_merge_sort_string_reverse :: proc(xs: []string) {bottom_merge_sort(
-			xs,
-			cmp_string_reverse,
-		)}
-
-	test_sort_string_reverse_helper(t, bottom_merge_sort_string_reverse)
 }
 

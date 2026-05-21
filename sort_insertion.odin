@@ -10,10 +10,6 @@
 // if the original array is partially sorted.
 package midgard
 
-import "base:intrinsics"
-import "core:testing"
-
-
 // Sort the xs slice in place, using the `cmp()` procedure
 //  parameter to compare elements.
 insertion_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
@@ -24,41 +20,5 @@ insertion_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
 			xs[j], xs[j - 1] = xs[j - 1], xs[j]
 		}
 	}
-}
-
-// -----------------------------------------------
-// Tests
-// -----------------------------------------------
-
-@(test)
-test_insertion_sort :: proc(t: ^testing.T) {
-
-	insertion_sort_int :: proc(xs: []int) {insertion_sort(xs, cmp_int)}
-
-	test_sort_int_helper(t, insertion_sort_int)
-}
-
-@(test)
-test_insertion_sort_f64 :: proc(t: ^testing.T) {
-
-	insertion_sort_f64 :: proc(xs: []f64) {insertion_sort(xs, cmp_f64)}
-
-	test_sort_float_helper(t, insertion_sort_f64)
-}
-
-@(test)
-test_insertion_sort_string :: proc(t: ^testing.T) {
-
-	insertion_sort_string :: proc(xs: []string) {insertion_sort(xs, cmp_string)}
-
-	test_sort_string_helper(t, insertion_sort_string)
-}
-
-@(test)
-test_insertion_sort_string_reverse :: proc(t: ^testing.T) {
-
-	insertion_sort_string_reverse :: proc(xs: []string) {insertion_sort(xs, cmp_string_reverse)}
-
-	test_sort_string_reverse_helper(t, insertion_sort_string_reverse)
 }
 

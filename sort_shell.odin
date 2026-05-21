@@ -11,9 +11,6 @@
 // sorted arrays.
 package midgard
 
-import "base:intrinsics"
-import "core:testing"
-
 // Sort the xs slice in place, using the `cmp()` procedure
 //  parameter to compare elements.
 shell_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
@@ -30,41 +27,5 @@ shell_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
 			}
 		}
 	}
-}
-
-// -----------------------------------------------
-// Tests
-// -----------------------------------------------
-
-@(test)
-test_shell_sort_int :: proc(t: ^testing.T) {
-
-	shell_sort_int :: proc(xs: []int) {shell_sort(xs, cmp_int)}
-
-	test_sort_int_helper(t, shell_sort_int)
-}
-
-@(test)
-test_shell_sort_f64 :: proc(t: ^testing.T) {
-
-	shell_sort_f64 :: proc(xs: []f64) {shell_sort(xs, cmp_f64)}
-
-	test_sort_float_helper(t, shell_sort_f64)
-}
-
-@(test)
-test_shell_sort_string :: proc(t: ^testing.T) {
-
-	shell_sort_string :: proc(xs: []string) {shell_sort(xs, cmp_string)}
-
-	test_sort_string_helper(t, shell_sort_string)
-}
-
-@(test)
-test_shell_sort_string_reverse :: proc(t: ^testing.T) {
-
-	shell_sort_string_reverse :: proc(xs: []string) {shell_sort(xs, cmp_string_reverse)}
-
-	test_sort_string_reverse_helper(t, shell_sort_string_reverse)
 }
 

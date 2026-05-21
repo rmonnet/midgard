@@ -12,9 +12,6 @@
 // Heap Sort doesn't play nice with the CPU cache.
 package midgard
 
-import "base:intrinsics"
-import "core:testing"
-
 // Sort the xs slice in place, using the `cmp()` procedure
 //  parameter to compare elements.
 heap_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
@@ -52,42 +49,5 @@ heap_sort :: proc(xs: []$T, cmp: proc(a, b: T) -> Cmp) {
 		size -= 1
 		sink(xs, 0, size, cmp)
 	}
-}
-
-// -----------------------------------------------
-// Tests
-// -----------------------------------------------
-
-
-@(test)
-test_heap_sort_int :: proc(t: ^testing.T) {
-
-	heap_sort_int :: proc(xs: []int) {heap_sort(xs, cmp_int)}
-
-	test_sort_int_helper(t, heap_sort_int)
-}
-
-@(test)
-test_heap_sort_f64 :: proc(t: ^testing.T) {
-
-	heap_sort_f64 :: proc(xs: []f64) {heap_sort(xs, cmp_f64)}
-
-	test_sort_float_helper(t, heap_sort_f64)
-}
-
-@(test)
-test_heap_sort_string :: proc(t: ^testing.T) {
-
-	heap_sort_string :: proc(xs: []string) {heap_sort(xs, cmp_string)}
-
-	test_sort_string_helper(t, heap_sort_string)
-}
-
-@(test)
-test_heap_sort_string_reverse :: proc(t: ^testing.T) {
-
-	heap_sort_string_reverse :: proc(xs: []string) {heap_sort(xs, cmp_string_reverse)}
-
-	test_sort_string_reverse_helper(t, heap_sort_string_reverse)
 }
 

@@ -36,3 +36,9 @@ clean:
 @disabled-tests:
     -grep -n '//@(test)' *.odin
     -grep -n '//@(test)' */*.odin
+
+# Vet the code in the project
+vet:
+    -odin check math
+    -odin check . -vet
+    -odin check test

@@ -36,6 +36,7 @@ aq_destroy_with_element_destroy :: proc(q: ^ArrayQueue($T), element_destroy: pro
 		}
 	}
 	delete(q.elements)
+	q.first_index = 0
 	q.next_index = 0
 	q.count = 0
 }
@@ -44,6 +45,7 @@ aq_destroy_with_element_destroy :: proc(q: ^ArrayQueue($T), element_destroy: pro
 aq_destroy_simple :: proc(q: ^ArrayQueue($T)) {
 
 	delete(q.elements)
+	q.first_index = 0
 	q.next_index = 0
 	q.count = 0
 }

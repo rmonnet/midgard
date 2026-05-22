@@ -1,11 +1,16 @@
 # Midgard, an Odin Library
 
-Midgard is a collection of algorithms and data structure that I built to refresh my knowledge.
+Midgard is a collection of algorithms and data structure that I built to refresh my knowledge and explore interesting algorithms.
+
+Midgard is not meant to be used as a library but more like a museum or a zoo (depending on your perspective on Computer Science).
+Each piece is presented as a standalone work, and can be lifted to be used in your work as a starting block.
+The file contains the source code, some documentation, and a set of tests.
 
 I chose Odin as the implementation language because it is simple, very readable, and doesn't hide the details of the memory management behind a garbage collector.
+The code should be easy to port to your favorite language if you need to.
 
 This library is built without AI coding agents because the goal of the exercise is to learn and I learn best by doing.
-I do, however, use Claude and Gemini in a separate window as tutors when I have specific questions and need to do research.
+I do, however, use Claude and Gemini in a separate window as mentors when I have specific questions and need to do research.
 
 The code in this collection is released under the MIT open source license but use at your own peril.
 

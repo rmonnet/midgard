@@ -8,14 +8,11 @@ _list-recipes:
     tokei ./dsa/
     echo ""; echo "./"
     tokei ./
-    echo ""; echo "./test/"
-    tokei ./test/
 
 # Run all the tests in the project
 test:
     -odin test dsa -vet -disallow-do -define:ODIN_TEST_SHORT_LOGS=true -define:ODIN_TEST_LOG_LEVEL=warning
     -odin test . -vet -disallow-do -define:ODIN_TEST_SHORT_LOGS=true -define:ODIN_TEST_LOG_LEVEL=warning
-    -odin test test -vet -disallow-do -define:ODIN_TEST_SHORT_LOGS=true -define:ODIN_TEST_LOG_LEVEL=warning
 
 # Run the single specified test (<package name>.<test name>)
 test-single name:
@@ -42,4 +39,3 @@ clean:
 vet:
     -odin check dsa -vet
     -odin check . -vet
-    -odin check test -vet

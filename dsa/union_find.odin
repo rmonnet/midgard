@@ -1,9 +1,8 @@
 // This file implements the Union_Find data structure managing a set of connected nodes.
 // Inspired by Algorithms, Video Lecture, Robert Sedgewick, Kevin Wayne (Lecture 1).
-package midgard
+package dsa
 
 import "core:mem"
-import "core:testing"
 
 // The Union_Find structure contains an array indexed by the nodes.
 // All connected nodes have the same value.
@@ -59,14 +58,20 @@ uf_is_connected :: proc(set: ^Union_Find, p, q: int) -> bool {
 // Tests
 // --------------------------------------------
 
+import "core:slice"
+import "core:testing"
+
 @(test)
 test_uf_union_2_elements :: proc(t: ^testing.T) {
 
 	set := uf_create(10)
 	defer uf_destroy(&set)
 	uf_union(&set, 4, 3)
-	expected := [?]int{0, 1, 2, 3, 3, 5, 6, 7, 8, 9}
-	expect_slices(t, set.ids, expected[:])
+	expected := []int{0, 1, 2, 3, 3, 5, 6, 7, 8, 9}
+
+	if !slice.equal(set.ids, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.ids)
+	}
 }
 
 @(test)
@@ -76,8 +81,11 @@ test_uf_union_3_elements :: proc(t: ^testing.T) {
 	defer uf_destroy(&set)
 	uf_union(&set, 4, 3)
 	uf_union(&set, 3, 8)
-	expected := [?]int{0, 1, 2, 8, 8, 5, 6, 7, 8, 9}
-	expect_slices(t, set.ids, expected[:])
+	expected := []int{0, 1, 2, 8, 8, 5, 6, 7, 8, 9}
+
+	if !slice.equal(set.ids, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.ids)
+	}
 }
 
 @(test)
@@ -90,8 +98,11 @@ test_uf_union_many_elements :: proc(t: ^testing.T) {
 	uf_union(&set, 6, 5)
 	uf_union(&set, 9, 4)
 	uf_union(&set, 2, 1)
-	expected := [?]int{0, 1, 1, 8, 8, 5, 5, 7, 8, 8}
-	expect_slices(t, set.ids, expected[:])
+	expected := []int{0, 1, 1, 8, 8, 5, 5, 7, 8, 8}
+
+	if !slice.equal(set.ids, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.ids)
+	}
 }
 
 @(test)
@@ -104,6 +115,8 @@ test_uf_connected :: proc(t: ^testing.T) {
 	uf_union(&set, 6, 5)
 	uf_union(&set, 9, 4)
 	uf_union(&set, 2, 1)
+
 	testing.expect(t, uf_is_connected(&set, 8, 9), "8 and 9 are connected")
 	testing.expect(t, !uf_is_connected(&set, 0, 5), "0 and 5 are not connected")
 }
+

@@ -1,9 +1,8 @@
 // This file implements the Weighted_Quick_Union_Find data structure managing a set of connected nodes.
 // Inspired by Algorithms, Video Lecture, Robert Sedgewick, Kevin Wayne (Lecture 1).
-package midgard
+package dsa
 
 import "core:mem"
-import "core:testing"
 
 // The Weighted_Quick_Union_Find structure contains an array indexed by the nodes.
 // Each node points to the id of its root. If a node is a root, it points to itself.
@@ -83,14 +82,20 @@ cuf_is_connected :: proc(set: ^Compressed_Union_Find, p, q: int) -> bool {
 // Tests
 // --------------------------------------------
 
+import "core:slice"
+import "core:testing"
+
 @(test)
 test_cuf_union_2_elements :: proc(t: ^testing.T) {
 
 	set := cuf_create(10)
 	defer cuf_destroy(&set)
 	cuf_union(&set, 4, 3)
-	expected := [?]int{0, 1, 2, 4, 4, 5, 6, 7, 8, 9}
-	expect_slices(t, set.parents, expected[:])
+	expected := []int{0, 1, 2, 4, 4, 5, 6, 7, 8, 9}
+
+	if !slice.equal(set.parents, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.parents)
+	}
 }
 
 @(test)
@@ -100,8 +105,11 @@ test_cuf_union_3_elements :: proc(t: ^testing.T) {
 	defer cuf_destroy(&set)
 	cuf_union(&set, 4, 3)
 	cuf_union(&set, 3, 8)
-	expected := [?]int{0, 1, 2, 4, 4, 5, 6, 7, 4, 9}
-	expect_slices(t, set.parents, expected[:])
+	expected := []int{0, 1, 2, 4, 4, 5, 6, 7, 4, 9}
+
+	if !slice.equal(set.parents, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.parents)
+	}
 }
 
 @(test)
@@ -118,8 +126,11 @@ test_cuf_union_many_elements :: proc(t: ^testing.T) {
 	cuf_union(&set, 7, 2)
 	cuf_union(&set, 6, 1)
 	cuf_union(&set, 7, 3)
-	expected := [?]int{6, 2, 6, 4, 6, 6, 6, 6, 4, 4}
-	expect_slices(t, set.parents, expected[:])
+	expected := []int{6, 2, 6, 4, 6, 6, 6, 6, 4, 4}
+
+	if !slice.equal(set.parents, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.parents)
+	}
 }
 
 @(test)
@@ -137,6 +148,7 @@ test_cuf_connected :: proc(t: ^testing.T) {
 	cuf_union(&set, 5, 0)
 	cuf_union(&set, 7, 2)
 	cuf_union(&set, 6, 1)
+
 	testing.expect(t, cuf_is_connected(&set, 3, 4))
 	testing.expect(t, cuf_is_connected(&set, 3, 8))
 	testing.expect(t, cuf_is_connected(&set, 3, 9))
@@ -183,3 +195,4 @@ test_cuf_connected :: proc(t: ^testing.T) {
 	testing.expect(t, !cuf_is_connected(&set, 9, 6))
 	testing.expect(t, !cuf_is_connected(&set, 9, 7))
 }
+

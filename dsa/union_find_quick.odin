@@ -1,9 +1,8 @@
 // This file implements the Quick_Union_Find data structure managing a set of connected nodes.
 // Inspired by Algorithms, Video Lecture, Robert Sedgewick, Kevin Wayne (Lecture 1).
-package midgard
+package dsa
 
 import "core:mem"
-import "core:testing"
 
 // The Quick_Union_Find structure contains an array indexed by the nodes.
 // Each node points to the id of its root. If a node is a root, it points to itself.
@@ -66,14 +65,20 @@ quf_is_connected :: proc(set: ^Quick_Union_Find, p, q: int) -> bool {
 // Tests
 // --------------------------------------------
 
+import "core:slice"
+import "core:testing"
+
 @(test)
 test_quf_union_2_elements :: proc(t: ^testing.T) {
 
 	set := quf_create(10)
 	defer quf_destroy(&set)
 	quf_union(&set, 4, 3)
-	expected := [?]int{0, 1, 2, 3, 3, 5, 6, 7, 8, 9}
-	expect_slices(t, set.parents, expected[:])
+	expected := []int{0, 1, 2, 3, 3, 5, 6, 7, 8, 9}
+
+	if !slice.equal(set.parents, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.parents)
+	}
 }
 
 @(test)
@@ -83,8 +88,11 @@ test_quf_union_3_elements :: proc(t: ^testing.T) {
 	defer quf_destroy(&set)
 	quf_union(&set, 4, 3)
 	quf_union(&set, 3, 8)
-	expected := [?]int{0, 1, 2, 8, 3, 5, 6, 7, 8, 9}
-	expect_slices(t, set.parents, expected[:])
+	expected := []int{0, 1, 2, 8, 3, 5, 6, 7, 8, 9}
+
+	if !slice.equal(set.parents, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.parents)
+	}
 }
 
 @(test)
@@ -97,8 +105,11 @@ test_quf_union_many_elements :: proc(t: ^testing.T) {
 	quf_union(&set, 6, 5)
 	quf_union(&set, 9, 4)
 	quf_union(&set, 2, 1)
-	expected := [?]int{0, 1, 1, 8, 3, 5, 5, 7, 8, 8}
-	expect_slices(t, set.parents, expected[:])
+	expected := []int{0, 1, 1, 8, 3, 5, 5, 7, 8, 8}
+
+	if !slice.equal(set.parents, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.parents)
+	}
 }
 
 @(test)
@@ -111,6 +122,8 @@ test_quf_connected :: proc(t: ^testing.T) {
 	quf_union(&set, 6, 5)
 	quf_union(&set, 9, 4)
 	quf_union(&set, 2, 1)
+
 	testing.expect(t, quf_is_connected(&set, 8, 9), "8 and 9 are connected")
 	testing.expect(t, !quf_is_connected(&set, 0, 5), "0 and 5 are not connected")
 }
+

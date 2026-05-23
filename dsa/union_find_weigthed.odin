@@ -1,9 +1,8 @@
 // This file implements the Weighted_Union_Find data structure managing a set of connected nodes.
 // Inspired by Algorithms, Video Lecture, Robert Sedgewick, Kevin Wayne (Lecture 1).
-package midgard
+package dsa
 
 import "core:mem"
-import "core:testing"
 
 // The Weighted_Union_Find structure contains an array indexed by the nodes.
 // Each node points to the id of its root. If a node is a root, it points to itself.
@@ -57,7 +56,7 @@ wuf_root_of :: proc(set: ^Weighted_Union_Find, p: int) -> int {
 wuf_union :: proc(set: ^Weighted_Union_Find, p, q: int) {
 
 	// To connect the two nodes (really the two sets of nodes),
-	// We chaneg the root of the p set to the root of the q set.
+	// We change the root of the p set to the root of the q set.
 	p_root := wuf_root_of(set, p)
 	q_root := wuf_root_of(set, q)
 	if set.sizes[p_root] < set.sizes[q_root] {
@@ -79,14 +78,20 @@ wuf_is_connected :: proc(set: ^Weighted_Union_Find, p, q: int) -> bool {
 // Tests
 // --------------------------------------------
 
+import "core:slice"
+import "core:testing"
+
 @(test)
 test_wuf_union_2_elements :: proc(t: ^testing.T) {
 
 	set := wuf_create(10)
 	defer wuf_destroy(&set)
 	wuf_union(&set, 4, 3)
-	expected := [?]int{0, 1, 2, 4, 4, 5, 6, 7, 8, 9}
-	expect_slices(t, set.parents, expected[:])
+	expected := []int{0, 1, 2, 4, 4, 5, 6, 7, 8, 9}
+
+	if !slice.equal(set.parents, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.parents)
+	}
 }
 
 @(test)
@@ -96,8 +101,11 @@ test_wuf_union_3_elements :: proc(t: ^testing.T) {
 	defer wuf_destroy(&set)
 	wuf_union(&set, 4, 3)
 	wuf_union(&set, 3, 8)
-	expected := [?]int{0, 1, 2, 4, 4, 5, 6, 7, 4, 9}
-	expect_slices(t, set.parents, expected[:])
+	expected := []int{0, 1, 2, 4, 4, 5, 6, 7, 4, 9}
+
+	if !slice.equal(set.parents, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.parents)
+	}
 }
 
 @(test)
@@ -114,8 +122,11 @@ test_wuf_union_many_elements :: proc(t: ^testing.T) {
 	wuf_union(&set, 7, 2)
 	wuf_union(&set, 6, 1)
 	wuf_union(&set, 7, 3)
-	expected := [?]int{6, 2, 6, 4, 6, 6, 6, 2, 4, 4}
-	expect_slices(t, set.parents, expected[:])
+	expected := []int{6, 2, 6, 4, 6, 6, 6, 2, 4, 4}
+
+	if !slice.equal(set.parents, expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, set.parents)
+	}
 }
 
 @(test)
@@ -128,6 +139,8 @@ test_wuf_connected :: proc(t: ^testing.T) {
 	wuf_union(&set, 6, 5)
 	wuf_union(&set, 9, 4)
 	wuf_union(&set, 2, 1)
+
 	testing.expect(t, wuf_is_connected(&set, 8, 9), "8 and 9 are connected")
 	testing.expect(t, !wuf_is_connected(&set, 0, 5), "0 and 5 are not connected")
 }
+

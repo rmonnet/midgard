@@ -9,6 +9,9 @@ The file contains the source code, some documentation, and a set of tests.
 I chose Odin as the implementation language because it is simple, very readable, and doesn't hide the details of the memory management behind a garbage collector.
 The code should be easy to port to your favorite language if you need to.
 
+Note: The Odin standard library already includes some of the algorithms and data structures listed here.
+They are not used on purpose since the goal is to learn and demonstrate. 
+
 This library is built without AI coding agents because the goal of the exercise is to learn and I learn best by doing.
 I do, however, use Claude and Gemini in a separate window as mentors when I have specific questions and need to do research.
 

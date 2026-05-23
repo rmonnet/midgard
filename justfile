@@ -3,16 +3,17 @@ _list-recipes:
     @just --list
 
 # Count the SLOCs in the project
-slocs:
+@slocs:
+    echo ""; echo "./dsa/"
+    tokei ./dsa/
+    echo ""; echo "./"
     tokei ./
-    @echo ""
-    tokei ./math/
-    @echo ""
+    echo ""; echo "./test/"
     tokei ./test/
 
 # Run all the tests in the project
 test:
-    -odin test math -vet -disallow-do -define:ODIN_TEST_SHORT_LOGS=true -define:ODIN_TEST_LOG_LEVEL=warning
+    -odin test dsa -vet -disallow-do -define:ODIN_TEST_SHORT_LOGS=true -define:ODIN_TEST_LOG_LEVEL=warning
     -odin test . -vet -disallow-do -define:ODIN_TEST_SHORT_LOGS=true -define:ODIN_TEST_LOG_LEVEL=warning
     -odin test test -vet -disallow-do -define:ODIN_TEST_SHORT_LOGS=true -define:ODIN_TEST_LOG_LEVEL=warning
 
@@ -39,6 +40,6 @@ clean:
 
 # Vet the code in the project
 vet:
-    -odin check math
+    -odin check dsa -vet
     -odin check . -vet
-    -odin check test
+    -odin check test -vet

@@ -7,6 +7,7 @@
 // We are assuming that the element type is Totally Ordered and that
 // we only need to define the `less_than` procedure to specify all the
 // comparison operators for the set.
+//
 // The sort is stable.
 // Its performance is O(N^2).
 // It can be faster than selection sort

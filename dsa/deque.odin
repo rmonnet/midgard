@@ -71,7 +71,7 @@ dq_destroy :: proc {
 
 // `dq_pop` retrieves an element from the Deque (LIFO).
 // The success return value indicates if the retrieval succeeded.
-// The value to retrieve is at the front of the list.
+// The element to retrieve is at the front of the list.
 dq_pop :: proc(d: ^Deque($T)) -> (element: T, success: bool) {
 
 	if d.first == nil {return}
@@ -89,7 +89,7 @@ dq_pop :: proc(d: ^Deque($T)) -> (element: T, success: bool) {
 
 // `dq_dequeue` retrieves an element from the Deque (LIFO).
 // The success return value indicates if the retrieval succeeded.
-// The value to retrieve is at the back of the list.
+// The element to retrieve is at the back of the list.
 dq_dequeue :: proc(d: ^Deque($T)) -> (element: T, success: bool) {
 
 	if d.last == nil {return}
@@ -105,8 +105,8 @@ dq_dequeue :: proc(d: ^Deque($T)) -> (element: T, success: bool) {
 	return old_last.element, true
 }
 
-// `dq_push` add an element to the Deque.
-// The value is inserted at the front of the list.
+// `dq_push` adds an element to the Deque.
+// The element is inserted at the front of the list.
 dq_push :: proc(d: ^Deque($T), value: T) {
 
 	new_first := new_clone(Deque_Node(T){element = value, next = d.first})
@@ -121,7 +121,7 @@ dq_push :: proc(d: ^Deque($T), value: T) {
 }
 
 // `dq_enqueue` add an element to the Deque.
-// The value is inserted at the front of the list.
+// The element is inserted at the front of the list.
 dq_enqueue :: dq_push
 
 // `dq_size` returns the number of elements in the Deque.

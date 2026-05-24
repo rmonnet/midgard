@@ -1,25 +1,43 @@
-// This file implements a classic Deque data structure using a linked list.
-// The deque combines a stack (Last In - First Out) and a Queue (First In - First Out).
-//
-// Reference: Algorithms by Sedgewick and Wayne, Lecture 3.
+/*
+This file implements a classic Deque data structure using a linked list.
+
+References:
+- Algorithms by Sedgewick and Wayne, Lecture 3.
+- [Geek for Geek - Deque Data Structure](https://www.geeksforgeeks.org/dsa/deque-set-1-introduction-applications)
+
+The Deque combines a Stack (Last In - First Out) and a Queue (Fist In - First Out).
+The Stack semantic is `push` to add an element and `pop` to remove an element.
+The Queue semantic is `enqueue` to add an element and `dequeue` to remove an element.
+
+We will use a linked-list to represent the Deque.
+The advantage of the linked-list is that it can naturally grow and shrink when we add and remove elements.
+We will add elements at the front of the list, this will push the previous element further toward the back of the list with the first element at the back.
+- `push` and `enqueue` both add an element to the front of the list.
+- `pop` removes the element at the front of the list (LIFO)
+- `dequeue` removes the element at the back of the list (FIFO)
+
+Because, when removing the back element of the list, we need to rebuild the `next` pointer on the next-to-last element, we need a double linked-list.
+*/
 package dsa
 
-// The Linked_List_Node represents a node of a single Linked List.
+// `Deque_Node` represents a node of the single Linked List.
 Deque_Node :: struct($T: typeid) {
-	element: T,
-	next:    ^Deque_Node(T),
+	element:  T,
+	previous: ^Deque_Node(T),
+	next:     ^Deque_Node(T),
 }
 
-// The Deque defines a Stack/Queue data structure.
-// It is initialized by default.
+// `Deque` defines a Stack/Queue data structure.
+// In Odin, it is initialized by default, no need for a constructor.
 Deque :: struct($T: typeid) {
 	first: ^Deque_Node(T),
 	last:  ^Deque_Node(T),
 	count: int,
 }
 
-// Destroy a Deque of elements which don't use dynamic allocation.
-dq_destroy_unmanaged_elements :: proc(d: ^Deque($T)) {
+// `dq_destroy_unmanaged` destroys a Deque of elements which don't use dynamic allocation.
+// Because there is no constructor, the Deque could be reused after a call to `destroy`.
+dq_destroy_unmanaged :: proc(d: ^Deque($T)) {
 
 	for node := d.first; node != nil; node = node.next {
 		free(node)
@@ -30,10 +48,11 @@ dq_destroy_unmanaged_elements :: proc(d: ^Deque($T)) {
 	d.count = 0
 }
 
-// Destroy a Deque of elements which use dynamic allocation.
-// The caller must pass a procedure to deallocate the individual
-// elements.
-dq_destroy_managed_elements :: proc(d: ^Deque($T), destroy_element: proc(element: T)) {
+// `dq_destroy_managed` destroys a Deque of elements which use dynamic allocation.
+// The caller must pass the procedure `destroy_element` to deallocate
+// the individual elements.
+// Because there is no constructor, the Deque could be reused after a call to `destroy`.
+dq_destroy_managed :: proc(d: ^Deque($T), destroy_element: proc(element: T)) {
 
 	for node := d.first; node != nil; node = node.next {
 		destroy_element(node.element)
@@ -46,70 +65,66 @@ dq_destroy_managed_elements :: proc(d: ^Deque($T), destroy_element: proc(element
 }
 
 dq_destroy :: proc {
-	dq_destroy_unmanaged_elements,
-	dq_destroy_managed_elements,
+	dq_destroy_unmanaged,
+	dq_destroy_managed,
 }
 
-// Pop a value from the deque, the success return value
-// is set to false if there is no element to pop.
-dq_pop :: proc(d: ^Deque($T)) -> (value: T, success: bool) {
+// `dq_pop` retrieves an element from the Deque (LIFO).
+// The success return value indicates if the retrieval succeeded.
+// The value to retrieve is at the front of the list.
+dq_pop :: proc(d: ^Deque($T)) -> (element: T, success: bool) {
 
-	// For the Stack behavior, the values are pushed on the front
-	//  and popped from the front.
 	if d.first == nil {return}
-	first := d.first
-	defer free(first)
-	d.first = first.next
-	// The only case we need to update the last pointer is
-	// when we only have one element in the queue.
+	old_first := d.first
+	defer free(old_first)
+	d.first = old_first.next
 	if d.first == nil {
 		d.last = nil
+	} else {
+		d.first.previous = nil
 	}
 	d.count -= 1
-	return first.element, true
+	return old_first.element, true
 }
 
-// Remove a value from the Deque, the ok return value
-// is set to false if there is no element to remove.
-//
-// Since we pop and dequeue from the front of the Deque,
-// the two procedures are synonymous.
-dq_dequeue :: dq_pop
+// `dq_dequeue` retrieves an element from the Deque (LIFO).
+// The success return value indicates if the retrieval succeeded.
+// The value to retrieve is at the back of the list.
+dq_dequeue :: proc(d: ^Deque($T)) -> (element: T, success: bool) {
 
-// Push a value on the Deque.
+	if d.last == nil {return}
+	old_last := d.last
+	defer free(old_last)
+	d.last = old_last.previous
+	if d.last == nil {
+		d.first = nil
+	} else {
+		d.last.next = nil
+	}
+	d.count -= 1
+	return old_last.element, true
+}
+
+// `dq_push` add an element to the Deque.
+// The value is inserted at the front of the list.
 dq_push :: proc(d: ^Deque($T), value: T) {
 
-	// For the Stack behavior, the values are pushed on the front
-	//  and popped from the front.
 	new_first := new_clone(Deque_Node(T){element = value, next = d.first})
+	if d.first != nil {
+		d.first.previous = new_first
+	}
 	d.first = new_first
-	// The only case we need to update the last pointer is
-	// when we add the first element to the queue.
 	if d.last == nil {
 		d.last = new_first
 	}
 	d.count += 1
 }
 
-// Add an element on the queue.
-dq_enqueue :: proc(d: ^Deque($T), value: T) {
+// `dq_enqueue` add an element to the Deque.
+// The value is inserted at the front of the list.
+dq_enqueue :: dq_push
 
-	// For the Queue behavior, the values are queued onto the back
-	//  and dequeued from the front.
-	new_last := new_clone(Deque_Node(T){element = value, next = nil})
-	if d.last != nil {
-		d.last.next = new_last
-	}
-	d.last = new_last
-	// The only case we need to update the first pointer is
-	// when we add the first element to the queue.
-	if d.first == nil {
-		d.first = new_last
-	}
-	d.count += 1
-}
-
-// Returns the number of values in the Deque.
+// `dq_size` returns the number of elements in the Deque.
 dq_size :: proc(d: Deque($T)) -> int {
 
 	return d.count
@@ -169,12 +184,12 @@ test_dq_pop_not_empty :: proc(t: ^testing.T) {
 	defer dq_destroy(&d)
 	dq_push(&d, 1)
 	dq_push(&d, 2)
-	value, success := dq_pop(&d)
+	element, success := dq_pop(&d)
 	testing.expect(t, success)
-	testing.expect_value(t, 2, value)
-	value, success = dq_pop(&d)
+	testing.expect_value(t, 2, element)
+	element, success = dq_pop(&d)
 	testing.expect(t, success)
-	testing.expect_value(t, 1, value)
+	testing.expect_value(t, 1, element)
 	_, success = dq_pop(&d)
 	testing.expect(t, !success)
 }
@@ -186,12 +201,12 @@ test_dq_dequeue_not_empty :: proc(t: ^testing.T) {
 	defer dq_destroy(&d)
 	dq_enqueue(&d, 1)
 	dq_enqueue(&d, 2)
-	value, success := dq_dequeue(&d)
+	element, success := dq_dequeue(&d)
 	testing.expect(t, success)
-	testing.expect_value(t, 1, value)
-	value, success = dq_dequeue(&d)
+	testing.expect_value(t, 1, element)
+	element, success = dq_dequeue(&d)
 	testing.expect(t, success)
-	testing.expect_value(t, 2, value)
+	testing.expect_value(t, 2, element)
 	_, success = dq_dequeue(&d)
 	testing.expect(t, !success)
 }

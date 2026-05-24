@@ -1,6 +1,9 @@
 /*
 This file contains an implementation of a Max Binary Heap.
 
+References:
+- Algorithms by Sedgewick and Wayne, Lecture 7
+
 The Binary Heap is a Binary Tree such that all levels are populated except some of the last level.
 The heap is such that each element is larger than its two children (ordering property).
 

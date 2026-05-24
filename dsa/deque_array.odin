@@ -308,7 +308,7 @@ test_adq_first_index_wraps_correctly_for_queue :: proc(t: ^testing.T) {
 	// dequeue()*7   : [_ _ _ _ _ _ _ 8]  (count=1, len=8, first_index=7, next_index=0)
 	element: int
 	success: bool
-	for i in 1 ..= 7 {element, success = adq_dequeue(&d)}
+	for _ in 1 ..= 7 {element, success = adq_dequeue(&d)}
 	testing.expect_value(t, element, 7)
 	testing.expect(t, success)
 	testing.expect_value(t, adq_size(d), 1)
@@ -349,7 +349,7 @@ test_adq_next_index_wraps_correctly_for_stack :: proc(t: ^testing.T) {
 	for i in 1 ..= 8 {
 		adq_push(&d, i)
 	}
-	for i in 1 ..= 4 {
+	for _ in 1 ..= 4 {
 		_, _ = adq_dequeue(&d)
 	}
 	testing.expect_value(t, adq_size(d), 4)

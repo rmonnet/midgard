@@ -54,9 +54,8 @@ quick_select :: proc(xs: []$T, k: int, less_than: proc(a, b: T) -> bool) -> T {
 	return xs[k]
 }
 
-// ------------------------------------------
 // Tests
-// ------------------------------------------
+// -----
 
 import "core:testing"
 

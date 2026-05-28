@@ -193,9 +193,8 @@ om_keys :: proc(m: Ordered_Map($K, $V)) -> []K {
 	return keys[:]
 }
 
-// -------------------------------
 // Tests
-// -------------------------------
+// -----
 
 import "core:slice"
 import "core:testing"

@@ -90,9 +90,8 @@ three_way_quick_sort :: proc(xs: []$T, less_than: proc(a, b: T) -> bool) {
 	sort(xs, 0, len(xs) - 1, less_than)
 }
 
-// ------------------------------------------
 // Tests
-// ------------------------------------------
+// -----
 
 import "core:math/rand"
 import "core:slice"

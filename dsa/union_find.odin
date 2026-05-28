@@ -54,9 +54,8 @@ uf_is_connected :: proc(set: ^Union_Find, p, q: int) -> bool {
 	return set.ids[p] == set.ids[q]
 }
 
-// --------------------------------------------
 // Tests
-// --------------------------------------------
+// -----
 
 import "core:slice"
 import "core:testing"

@@ -248,9 +248,8 @@ bst_map_delete_min :: proc(m: ^BST_Map($K, $V)) -> (min_key: K, min_value: V, ok
 	return
 }
 
-// -------------------------------
 // Tests
-// -------------------------------
+// -----
 
 import "core:slice"
 import "core:testing"

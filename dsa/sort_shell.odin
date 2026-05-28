@@ -33,9 +33,8 @@ shell_sort :: proc(xs: []$T, less_than: proc(a, b: T) -> bool) {
 	}
 }
 
-// ------------------------------------------
 // Tests
-// ------------------------------------------
+// -----
 
 import "core:math/rand"
 import "core:slice"

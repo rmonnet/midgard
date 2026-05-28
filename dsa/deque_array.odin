@@ -158,9 +158,8 @@ adq_size :: proc(d: Array_Deque($T)) -> int {
 	return d.count
 }
 
-// ---------------------------------------
 // Tests
-// ---------------------------------------
+// -----
 
 import "core:testing"
 

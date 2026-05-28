@@ -74,9 +74,8 @@ wuf_is_connected :: proc(set: ^Weighted_Union_Find, p, q: int) -> bool {
 	return wuf_root_of(set, p) == wuf_root_of(set, q)
 }
 
-// --------------------------------------------
 // Tests
-// --------------------------------------------
+// -----
 
 import "core:slice"
 import "core:testing"

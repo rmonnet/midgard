@@ -61,9 +61,8 @@ quf_is_connected :: proc(set: ^Quick_Union_Find, p, q: int) -> bool {
 	return quf_root_of(set, p) == quf_root_of(set, q)
 }
 
-// --------------------------------------------
 // Tests
-// --------------------------------------------
+// -----
 
 import "core:slice"
 import "core:testing"

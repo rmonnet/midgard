@@ -150,9 +150,8 @@ lm_keys :: proc(m: Map($K, $V)) -> []K {
 	return keys[:]
 }
 
-// -------------------------------
 // Tests
-// -------------------------------
+// -----
 
 import "core:slice"
 import "core:testing"

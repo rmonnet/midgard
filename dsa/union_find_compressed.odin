@@ -78,9 +78,8 @@ cuf_is_connected :: proc(set: ^Compressed_Union_Find, p, q: int) -> bool {
 	return cuf_root_of(set, p) == cuf_root_of(set, q)
 }
 
-// --------------------------------------------
 // Tests
-// --------------------------------------------
+// -----
 
 import "core:slice"
 import "core:testing"

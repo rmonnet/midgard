@@ -1,23 +1,33 @@
 // This file contains the implementation for the quick  sort algorithm.
-//
-// Quick sort sorts the xs array by recursively partitioning the array
-// into two sub-arrays where elements in the first sub-array are less than
-// a selected element and elements in the second sub-array are greater than
-// a selected element. The selected element is moved between the two sub-arrays
-// and then each sub-array is sorted recursively.
-//
-// Quick sort sorts the array in-place and doesn't require a secondary array
-// like merge sort does.
-//
-// We are assuming that the element type is Totally Ordered and that
-// we only need to define the `less_than` procedure to specify all the
-// comparison operators for the set.
-//
-// The sort is not stable.
-// Its worse time is O(N^2) but its average time is O(N . lgN). If we start by randomly
-// shuffling the array, we have a high probability than the runtime will be close to the average
-// time. In this case it is faster than merge sort because there are less element swapping.
 package dsa
+
+/*
+# Quick Sort Algorithm
+
+## Summary
+
+Quick sort sorts the xs array by recursively partitioning the array
+into two sub-arrays where elements in the first sub-array are less than
+a selected element and elements in the second sub-array are greater than
+a selected element. The selected element is moved between the two sub-arrays
+and then each sub-array is sorted recursively.
+
+## Notes
+
+Quick sort sorts the array in-place and doesn't require a secondary array
+like merge sort does.
+
+We are assuming that the element type is Totally Ordered and that
+we only need to define the `less_than` procedure to specify all the
+comparison operators for the set.
+
+## Properties
+
+The sort is not stable.
+Its worse time is O(N^2) but its average time is O(N . lgN). If we start by randomly
+shuffling the array, we have a high probability than the runtime will be close to the average
+time. In this case it is faster than merge sort because there are less element swapping.
+*/
 
 // Sort the xs slice in place, using the `cmp()` procedure
 //  parameter to compare elements.

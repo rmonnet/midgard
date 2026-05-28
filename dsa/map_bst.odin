@@ -1,19 +1,28 @@
-// This files implement a Map. The Map structure stores (key, value) pairs
-// where the keys are considered immutable. This implementation stores
-// all the values using a Binary Search Tree. It doesn't support
-// dynamically allocated keys, only dynamically allocated values.
-//
-// If the type of the values is dynamically allocated and a value is returned
-// by a procedure, it is the responsibility of the caller to destroy it.
-//
-// The search and insert have a worst case of O(lg N) if the inputs are randomly ordered
-// but can degenerate to a O(N) if the inputs are strictly in order. In addition, a combination
-// of delete and add may result in an unbalanced tree making the performances trending towards
-// the worst case.
-package midgard
+// This files implement a Map.
+package dsa
 
 import "base:intrinsics"
-import "core:testing"
+
+/*
+# Binary Search Tree Data Structure
+
+## Summary
+
+The Map structure stores (key, value) pairs
+where the keys are considered immutable. This implementation stores
+all the values using a Binary Search Tree. It doesn't support
+dynamically allocated keys, only dynamically allocated values.
+
+If the type of the values is dynamically allocated and a value is returned
+by a procedure, it is the responsibility of the caller to destroy it.
+
+## Properties
+
+The search and insert have a worst case of O(lg N) if the inputs are randomly ordered
+but can degenerate to a O(N) if the inputs are strictly in order. In addition, a combination
+of delete and add may result in an unbalanced tree making the performances trending towards
+the worst case.
+*/
 
 BST_Map_Node :: struct($K: typeid, $V: typeid) where intrinsics.type_is_comparable(K) {
 	key:   K,
@@ -243,6 +252,9 @@ bst_map_delete_min :: proc(m: ^BST_Map($K, $V)) -> (min_key: K, min_value: V, ok
 // Tests
 // -------------------------------
 
+import "core:slice"
+import "core:testing"
+
 @(test)
 test_bst_map_is_empty :: proc(t: ^testing.T) {
 
@@ -389,8 +401,11 @@ test_bst_map_keys :: proc(t: ^testing.T) {
 
 	keys := bst_map_keys(m)
 	defer delete(keys)
+	expected := []int{1, 2, 3, 4}
 
-	expect_slices(t, keys, []int{1, 2, 3, 4})
+	if !slice.equal(keys[:], expected) {
+		testing.expectf(t, false, "expected %v but got %v\n", expected, keys)
+	}
 }
 
 @(test)

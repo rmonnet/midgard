@@ -1,9 +1,17 @@
 // This file contains an implementation for the shuffle algorithm.
-// This algorithm randomizes the order of the elements in a slice
-// approximating a uniform distribution.
 package dsa
 
 import rand "core:math/rand"
+
+/*
+# Shuffle Algorithm
+
+## Summary
+
+This algorithm randomizes the order of the elements in a slice
+approximating a uniform distribution.
+*/
+
 
 // `shuffle` randomizes the elements in the slice.
 // It can be thought as the inverse of a sort algorithm.
